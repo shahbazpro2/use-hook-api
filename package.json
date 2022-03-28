@@ -1,7 +1,11 @@
 {
   "name": "use-hook-api",
-  "version": "1.0.2",
-  "description": "",
+  "version": "1.0.3",
+  "description": "Custom hook for api",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shahbazpro2/use-hook-api.git"
+  },
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
