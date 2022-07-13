@@ -40,13 +40,8 @@ const responseApi = async (url, method, data, headerData = {}) => {
                 cancelRequest = c;
             })
         })
+        return { error: false, status: res.status, data: res.data?.data, message: objectToArray(res.data?.message), res: res.data }
 
-        if (!res.data.hasOwnProperty('data'))
-            return { error: false, status: res.status, data: res.data, message: [] }
-        else if (res.data.hasOwnProperty('message'))
-            return { error: false, status: res.status, data: res.data.data, message: objectToArray(res.data.message) }
-        else
-            return { error: false, status: res.status, data: res.data.data, message: objectToArray(res.data.data) }
     } catch (err) {
         let data
         if (err.response?.status === 500) {

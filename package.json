@@ -1,6 +1,6 @@
 {
   "name": "use-hook-api",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Custom hook for api",
   "repository": {
     "type": "git",
@@ -13,11 +13,11 @@
   "author": "shahbazpro2",
   "license": "ISC",
   "peerDependencies": {
-    "axios": "^0.26.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   },
   "dependencies": {
+    "axios": "^0.27.2",
     "use-hook-api": "^1.0.0"
   }
 }
