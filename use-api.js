@@ -1,51 +1,154 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from 'react'
+import { setApiCacheAtom, useApiCache } from "./apiJotai.js"
+import { useSetAtom } from "jotai"
+import { useEffect, useState } from "react"
+import { v4 as uuid } from "uuid"
+import { setFeedbackAtom } from "./feedback.js"
 
-const useApi = (apiFun, callback, errCallback) => {
-    const [state, setState] = useState({
-        loading: false,
-        error: null,
-        data: null,
-        res: null,
-        message: null
-    })
+const key = uuid()
+const cacheFunctions = new Map()
+export const useApi = (
+    { both, errMsg, successMsg, resErrMsg, resSuccessMsg, cache, fullRes, unmount } = { both: false, errMsg: true, resErrMsg: "", resSuccessMsg: "", fullRes: false },
+    fun,
+    topSuccessCallback,
+    topErrCallback
+) => {
+    const setFeedback = useSetAtom(setFeedbackAtom)
+    const setApiCache = useSetAtom(setApiCacheAtom)
+    const cacheData = useApiCache(cache)
+    const [state, setState] = useState({})
+
+
+
 
     useEffect(() => {
-        if (apiFun) {
-            processing(apiFun, callback, errCallback)
+        if (fun) {
+            processing({ fun, topSuccessCallback, topErrCallback })
+        }
+
+        if (unmount) {
+            return () => {
+                clearCache()
+            }
         }
     }, [])
 
-    const executeApi = async (fun, callback, errCallback) => {
+    const executeApi = async (fun, successCallback, errCallback, config) => {
         if (fun) {
-            processing(fun, callback, errCallback)
+            processing({ fun, successCallback, errCallback, config })
         }
-
     }
 
-    const processing = async (api, callback, errCallback) => {
-        setState({ ...state, loading: true })
-        let res = null
-        if (api instanceof Function) res = await api()
-        else res = await api
-        if (res) {
-            setState({
-                loading: false,
-                error: res.error,
-                message: res.message,
-                data: !res.error ? res.data : null,
-                res: res.res
+    const clearCache = () => {
+        if (cache) {
+            setApiCache({
+                key: cache,
+                value: {}
             })
+            cacheFunctions.delete(cache)
+        }
+    }
 
+
+
+    const refetch = () => {
+        const { fun, callback, errCallback, config } = cacheFunctions.get(cache || key)
+        processing({ fun, callback, errCallback, config })
+    }
+
+
+    const processing = async ({ fun, successCallback, errCallback, config }) => {
+        cacheFunctions.set(cache || key, { fun, successCallback, errCallback, config })
+        let stateVal = {
+            ...state[cache || key], loading: config?.loading ?? true
+        }
+
+        if (cacheData?.loading === false) {
+            stateVal = { ...cacheData, loading: config?.loading ?? false }
+        }
+
+        if (config?.loading !== false) {
+            if (cache) setApiCache({
+                key: cache,
+                value: stateVal
+            })
+            else
+                setState(prevState => ({ ...prevState, [cache || key]: { ...stateVal } }))
+        }
+
+
+        let res = null
+
+        //check fun have callback or not
+        if (fun instanceof Function) res = await fun()
+        else res = await fun
+
+        if (res) {
             if (!res.error) {
-                if (callback) callback(res)
+                stateVal = {
+                    loading: false,
+                    error: res.error,
+                    message: resSuccessMsg || res.message,
+                    data: !res.error ? res.data : null,
+                    fullRes: res?.fullRes
+                }
+
+                if (!fullRes) {
+                    delete stateVal.fullRes
+                }
+
+                if (cache) {
+                    setApiCache({
+                        key: cache,
+                        value: { ...stateVal }
+                    })
+                } else
+                    setState(prevState => ({ ...prevState, [key]: { ...stateVal } }));
+
+
+
+                ((successMsg || both) && config?.successMsg !== false) && setFeedback({ message: resSuccessMsg || res.message, type: 'success' })
+            } else if (res.error) {
+                stateVal = {
+                    loading: false,
+                    error: res.error,
+                    message: resErrMsg || res.message,
+                    data: !res.error ? res.data : null,
+                    fullRes: res?.fullRes,
+                }
+                if (!fullRes) {
+                    delete stateVal.fullRes
+                }
+                if (cache) {
+                    setApiCache({
+                        key: cache,
+                        value: { ...stateVal }
+                    })
+                } else {
+                    setState(prevState => ({
+                        ...prevState,
+                        [key]: {
+                            ...stateVal,
+                        }
+                    }));
+                }
+
+                ((errMsg || both) && config?.errMsg !== false) && context.setFeedback(resErrMsg || res.message, true)
+            }
+            if (!res.error) {
+                if (successCallback) successCallback(stateVal)
+                if (topSuccessCallback) topSuccessCallback(stateVal)
             }
             if (res.error) {
-                if (errCallback) errCallback(res)
+                if (errCallback) errCallback(stateVal)
+                if (topErrCallback) topErrCallback(stateVal)
             }
         }
     }
-    return [executeApi, { ...state }]
-}
 
-export default useApi
+    if (cache)
+        return [executeApi, { ...cacheData, clearCache, refetch }]
+
+    return [executeApi, { ...state[key], clearCache, refetch }]
+
+}
