@@ -14,6 +14,19 @@ export const clearFeedbackAtom = atom(null, (get, set) => {
     set(feedbackAtom, { message: null, type: 'error' })
 })
 
+export const useSetFeedback = () => {
+    const setFeedback = useSetAtom(setFeedbackAtom)
+
+    return useMemo(() => {
+        return (payload) => setFeedback({
+            message: payload?.[0],
+            type: payload?.[1] || 'error'
+        })
+    })
+}
+
+
+
 export const useFeedbackState = () => {
     const [feedbackState] = useAtom(feedbackAtom)
     const clearState = useSetAtom(clearFeedbackAtom)

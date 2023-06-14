@@ -133,7 +133,7 @@ export const useApi = (
                     }));
                 }
 
-                ((errMsg || both) && config?.errMsg !== false) && context.setFeedback(resErrMsg || res.message, true)
+                ((errMsg || both) && config?.errMsg !== false) && setFeedback(resErrMsg || res.message, true)
             }
             if (!res.error) {
                 if (successCallback) successCallback(stateVal)
