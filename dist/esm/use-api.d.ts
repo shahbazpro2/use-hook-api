@@ -13,7 +13,7 @@ interface Config {
     successMsg?: boolean;
     errMsg?: boolean;
 }
-export declare const useApi: ({ both, errMsg, successMsg, resErrMsg, resSuccessMsg, cache, fullRes, unmount }: Props, fun?: Function, topSuccessCallback?: Function, topErrCallback?: Function) => (((fun: Function, successCallback: Function, errCallback: Function, config: Config) => Promise<void>) | {
+export declare const useApi: ({ both, errMsg, successMsg, resErrMsg, resSuccessMsg, cache, fullRes, unmount }: Props, fun?: Function, topSuccessCallback?: Function, topErrCallback?: Function) => (((fun: Function, successCallback?: Function, errCallback?: Function, config?: Config) => Promise<void>) | {
     clearCache: () => void;
     refetch: () => void;
     loading: boolean;
