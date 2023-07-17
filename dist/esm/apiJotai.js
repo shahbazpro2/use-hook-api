@@ -1,6 +1,7 @@
 import { __assign } from "tslib";
-import { atom, useAtom } from "jotai";
-import React from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { atom, useAtom } from 'jotai';
+import React from 'react';
 export var apiCacheAtom = atom({});
 export var setApiCacheAtom = atom(null, function (get, set, action) {
     var _a;

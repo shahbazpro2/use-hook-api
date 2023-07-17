@@ -25,6 +25,14 @@ interface Config {
   errMsg?: boolean
 }
 
+interface StateVal {
+  loading: boolean
+  error: boolean
+  status: number
+  message: string
+  data: any
+  fullRes?: any
+}
 //state has key and value
 interface State {
   [key: string]: {
@@ -37,7 +45,7 @@ interface State {
   }
 }
 
-type CallbackState = (state: State) => State | Promise<any>
+type CallbackState = (state: StateVal) => StateVal | Promise<any>
 interface Params {
   fun: () => any | Promise<any>
   successCallback?: CallbackState
@@ -140,7 +148,6 @@ export const useApi = (
             value: { ...stateVal },
           })
         } else setState((prevState: State) => ({ ...prevState, [key]: { ...stateVal } }))
-
         ;(successMsg || both) &&
           config?.successMsg !== false &&
           setFeedback({ message: resSuccessMsg || res.message, type: 'success' })
@@ -169,9 +176,7 @@ export const useApi = (
             },
           }))
         }
-
-        ;(errMsg || both) &&
-          config?.errMsg !== false &&
+        if ((errMsg || both) && config?.errMsg !== false)
           setFeedback({ message: resErrMsg || res.message, type: 'error' })
       }
       if (!res.error) {

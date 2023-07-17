@@ -1,8 +1,9 @@
-import { atom, useAtom, useSetAtom } from "jotai";
-import { useMemo } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { atom, useAtom, useSetAtom } from 'jotai';
+import { useMemo } from 'react';
 export var feedbackAtom = atom({
     message: null,
-    type: 'error'
+    type: 'error',
 });
 export var setFeedbackAtom = atom(null, function (_get, set, payload) {
     set(feedbackAtom, payload);
@@ -13,10 +14,12 @@ export var clearFeedbackAtom = atom(null, function (_get, set) {
 export var useSetFeedback = function () {
     var setFeedback = useSetAtom(setFeedbackAtom);
     return useMemo(function () {
-        return function (payload) { return setFeedback({
-            message: payload === null || payload === void 0 ? void 0 : payload[0],
-            type: (payload === null || payload === void 0 ? void 0 : payload[1]) || 'error'
-        }); };
+        return function (payload) {
+            return setFeedback({
+                message: payload === null || payload === void 0 ? void 0 : payload[0],
+                type: (payload === null || payload === void 0 ? void 0 : payload[1]) || 'error',
+            });
+        };
     }, []);
 };
 export var useFeedbackState = function () {
@@ -25,9 +28,6 @@ export var useFeedbackState = function () {
     var clearFeedback = useMemo(function () {
         return function () { return clearState(); };
     }, []);
-    return [
-        feedbackState,
-        clearFeedback
-    ];
+    return [feedbackState, clearFeedback];
 };
 //# sourceMappingURL=feedback.js.map

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { atom, useAtom, useSetAtom } from 'jotai'
 import { useMemo } from 'react'
 

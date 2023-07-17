@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 function objectToArray(obj, arr, tempKey) {
     var _a;
     if (arr === void 0) { arr = []; }
@@ -36,5 +38,5 @@ function objectToArray(obj, arr, tempKey) {
     }
     return arr;
 }
-export default objectToArray;
+exports.default = objectToArray;
 //# sourceMappingURL=objectToArray.js.map
