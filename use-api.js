@@ -88,6 +88,7 @@ export const useApi = (
                 stateVal = {
                     loading: false,
                     error: res.error,
+                    status: res.status,
                     message: resSuccessMsg || res.message,
                     data: !res.error ? res.data : null,
                     fullRes: res?.fullRes
@@ -112,6 +113,7 @@ export const useApi = (
                 stateVal = {
                     loading: false,
                     error: res.error,
+                    status: res.status,
                     message: resErrMsg || res.message,
                     data: !res.error ? res.data : null,
                     fullRes: res?.fullRes,
@@ -133,7 +135,7 @@ export const useApi = (
                     }));
                 }
 
-                ((errMsg || both) && config?.errMsg !== false) && setFeedback(resErrMsg || res.message, true)
+                ((errMsg || both) && config?.errMsg !== false) && setFeedback({ message: resErrMsg || res.message, type: 'error' })
             }
             if (!res.error) {
                 if (successCallback) successCallback(stateVal)

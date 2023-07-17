@@ -1,6 +1,6 @@
 {
   "name": "use-hook-api",
-  "version": "3.0.8",
+  "version": "3.2.0",
   "description": "Custom hook for api",
   "type": "module",
   "repository": {
@@ -14,12 +14,15 @@
   "author": "shahbazpro2",
   "license": "ISC",
   "peerDependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react": ">=16.0.0",
+    "react-dom": ">=16.0.0"
   },
   "dependencies": {
-    "uuidv4": "^6.2.13",
     "axios": "^0.27.2",
-    "jotai": "^2.1.0"
+    "jotai": "^2.1.0",
+    "uuidv4": "^6.2.13"
+  },
+  "devDependencies": {
+    "typescript": "^5.1.6"
   }
 }
