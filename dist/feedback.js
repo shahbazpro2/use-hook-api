@@ -1,0 +1,37 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.useFeedbackState = exports.useSetFeedback = exports.clearFeedbackAtom = exports.setFeedbackAtom = exports.feedbackAtom = void 0;
+var jotai_1 = require("jotai");
+var react_1 = require("react");
+exports.feedbackAtom = (0, jotai_1.atom)({
+    message: null,
+    type: 'error'
+});
+exports.setFeedbackAtom = (0, jotai_1.atom)(null, function (get, set, payload) {
+    set(exports.feedbackAtom, payload);
+});
+exports.clearFeedbackAtom = (0, jotai_1.atom)(null, function (get, set) {
+    set(exports.feedbackAtom, { message: null, type: 'error' });
+});
+var useSetFeedback = function () {
+    var setFeedback = (0, jotai_1.useSetAtom)(exports.setFeedbackAtom);
+    return (0, react_1.useMemo)(function () {
+        return function (payload) { return setFeedback({
+            message: payload === null || payload === void 0 ? void 0 : payload[0],
+            type: (payload === null || payload === void 0 ? void 0 : payload[1]) || 'error'
+        }); };
+    }, []);
+};
+exports.useSetFeedback = useSetFeedback;
+var useFeedbackState = function () {
+    var feedbackState = (0, jotai_1.useAtom)(exports.feedbackAtom)[0];
+    var clearState = (0, jotai_1.useSetAtom)(exports.clearFeedbackAtom);
+    var clearFeedback = (0, react_1.useMemo)(function () {
+        return function () { return clearState(); };
+    }, []);
+    return [
+        feedbackState,
+        clearFeedback
+    ];
+};
+exports.useFeedbackState = useFeedbackState;

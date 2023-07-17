@@ -2,28 +2,20 @@
 /* eslint-disable no-undef */
 
 import objectToArray from "./objectToArray.js";
-export let cancelRequest;
+import { allKeysExist } from "./response-api.js";
+export let cancelRequest: any = null;
 
 export const apiResStructure = {
   errKey: "message",
   dataKey: "data",
 };
 
-const allKeysExist = (obj, keys = []) => {
-  return keys.every((key) => {
-    if (typeof key === "string") {
-      const subKeys = key.split("||");
-      return subKeys.some((subKey) => obj?.hasOwnProperty(subKey.trim()));
-    }
-    return false;
-  });
-};
 
-const customApi = (fun) => {
-  const { errKey, dataKey } = apiResStructure;
+const customApi = (fun: Function) => {
+  const { errKey, dataKey }: typeof apiResStructure = apiResStructure;
   return async function apiFun() {
     try {
-      const res = await fun;
+      const res: any = await fun;
       if (res?.error)
         throw {
           response: {
@@ -64,7 +56,7 @@ const customApi = (fun) => {
           message: objectToArray(res.data),
           fullRes: res.data,
         };
-    } catch (err) {
+    } catch (err: any) {
       let data;
       if (err.response?.status === 500) {
         data = {

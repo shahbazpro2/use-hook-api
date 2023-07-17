@@ -4,7 +4,7 @@
 import axios from "axios"
 import objectToArray from "./objectToArray.js"
 const CancelToken = axios.CancelToken
-export let cancelRequest
+export let cancelRequest: any = null
 
 export const Axios = axios
 export const apiResStructure = {
@@ -14,8 +14,8 @@ export const apiResStructure = {
 
 
 
-const allKeysExist = (obj, keys = []) => {
-    return keys.every((key) => {
+export const allKeysExist = (obj: any, keys: any = []) => {
+    return keys.every((key: any) => {
         if (typeof key === 'string') {
             const subKeys = key.split('||');
             return subKeys.some((subKey) => obj?.hasOwnProperty(subKey.trim()));
@@ -25,8 +25,8 @@ const allKeysExist = (obj, keys = []) => {
 
 }
 
-const responseApi = (url, method, data, headerData = {}) => {
-    const { errKey, dataKey } = apiResStructure
+const responseApi = (url: string, method: string, data: any, headerData: any = {}) => {
+    const { errKey, dataKey }: typeof apiResStructure = apiResStructure
     return async function apiFun() {
         try {
             const res = await axios({
@@ -47,7 +47,7 @@ const responseApi = (url, method, data, headerData = {}) => {
                 return { error: false, status: res.status, data: res.data?.[dataKey] || res.data?.data, message: objectToArray(res.data?.[dataKey] || res.data?.data), fullRes: res.data }
             else
                 return { error: false, status: res.status, data: res.data, message: objectToArray(res.data), fullRes: res.data }
-        } catch (err) {
+        } catch (err: any) {
             let data
             if (err.response?.status === 500) {
                 data = { status: err.response?.status, message: ['Something went wrong.'] }

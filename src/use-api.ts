@@ -7,23 +7,55 @@ import { setFeedbackAtom } from "./feedback.js"
 
 const key = uuid()
 const cacheFunctions = new Map()
-export const useApi = (
-    { both, errMsg, successMsg, resErrMsg, resSuccessMsg, cache, fullRes, unmount } = { both: false, errMsg: true, resErrMsg: "", resSuccessMsg: "", fullRes: false },
-    fun,
-    topSuccessCallback,
-    topErrCallback
-) => {
+
+interface Props {
+    both?: boolean,
+    errMsg?: boolean,
+    successMsg?: boolean,
+    resErrMsg?: string,
+    resSuccessMsg?: string,
+    cache?: string,
+    fullRes?: boolean,
+    unmount?: boolean
+}
+
+interface Config {
+    loading?: boolean,
+    successMsg?: boolean,
+    errMsg?: boolean
+}
+
+//state has key and value
+interface State {
+    [key: string]: {
+        loading: boolean,
+        error: boolean,
+        status: number,
+        message: string,
+        data: any,
+        fullRes?: any
+    }
+}
+
+interface Params {
+    fun: Function,
+    successCallback?: Function,
+    errCallback?: Function,
+    config?: Config
+}
+
+export const useApi = ({ both = false, errMsg = true, successMsg = false, resErrMsg, resSuccessMsg, cache, fullRes, unmount }: Props, fun?: Function, topSuccessCallback?: Function, topErrCallback?: Function) => {
     const setFeedback = useSetAtom(setFeedbackAtom)
     const setApiCache = useSetAtom(setApiCacheAtom)
     const cacheData = useApiCache(cache)
-    const [state, setState] = useState({})
+    const [state, setState] = useState<State>({})
 
 
 
 
     useEffect(() => {
         if (fun) {
-            processing({ fun, topSuccessCallback, topErrCallback })
+            processing({ fun })
         }
 
         if (unmount) {
@@ -33,7 +65,7 @@ export const useApi = (
         }
     }, [])
 
-    const executeApi = async (fun, successCallback, errCallback, config) => {
+    const executeApi = async (fun: Function, successCallback: Function, errCallback: Function, config: Config) => {
         if (fun) {
             processing({ fun, successCallback, errCallback, config })
         }
@@ -43,7 +75,7 @@ export const useApi = (
         if (cache) {
             setApiCache({
                 key: cache,
-                value: {}
+                value: null
             })
             cacheFunctions.delete(cache)
         }
@@ -52,12 +84,12 @@ export const useApi = (
 
 
     const refetch = () => {
-        const { fun, callback, errCallback, config } = cacheFunctions.get(cache || key)
-        processing({ fun, callback, errCallback, config })
+        const { fun, successCallback, errCallback, config }: Params = cacheFunctions.get(cache || key)
+        processing({ fun, successCallback, errCallback, config })
     }
 
 
-    const processing = async ({ fun, successCallback, errCallback, config }) => {
+    const processing = async ({ fun, successCallback, errCallback, config }: Params) => {
         cacheFunctions.set(cache || key, { fun, successCallback, errCallback, config })
         let stateVal = {
             ...state[cache || key], loading: config?.loading ?? true

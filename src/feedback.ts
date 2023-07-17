@@ -1,12 +1,19 @@
 import { atom, useAtom, useSetAtom } from "jotai"
 import { useMemo } from "react"
 
-export const feedbackAtom = atom({
+interface FeedbackType {
+    message: string | null,
+    type: string
+}
+
+type SetFeedbackType = [string | null, string]
+
+export const feedbackAtom = atom<FeedbackType>({
     message: null,
     type: 'error'
 })
 
-export const setFeedbackAtom = atom(null, (get, set, payload) => {
+export const setFeedbackAtom = atom(null, (get, set, payload: FeedbackType) => {
     set(feedbackAtom, payload)
 })
 
@@ -18,11 +25,11 @@ export const useSetFeedback = () => {
     const setFeedback = useSetAtom(setFeedbackAtom)
 
     return useMemo(() => {
-        return (payload) => setFeedback({
+        return (payload: SetFeedbackType) => setFeedback({
             message: payload?.[0],
             type: payload?.[1] || 'error'
         })
-    })
+    }, [])
 }
 
 

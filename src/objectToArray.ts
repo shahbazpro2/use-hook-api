@@ -1,10 +1,10 @@
-function objectToArray(obj, arr = [], tempKey = null) {
+function objectToArray(obj: any, arr: any = [], tempKey: any = null) {
 	if (Array.isArray(obj)) {
 		for (let i = 0; i < obj.length; i++) {
-			if (typeof obj[i] === "object") {
+			if (typeof obj?.[i] === "object") {
 				objectToArray(obj[i], arr, tempKey);
 			} else {
-				arr.push(obj[i]);
+				arr.push(obj?.[i] || obj);
 			}
 		}
 	} else if (typeof obj === "object") {
@@ -18,7 +18,7 @@ function objectToArray(obj, arr = [], tempKey = null) {
 				if (
 					key === "icabbi_error" ||
 					(typeof obj[key] === "string" &&
-						['This field is required.', 'This field is required'].includes(obj[key])
+						['This field is required.', 'This field is required']?.includes(obj[key])
 					)
 				) {
 					arr.push(`${tempKey}: ${obj[key]}`);
