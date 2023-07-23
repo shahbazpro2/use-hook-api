@@ -1,23 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { atom, useAtom } from 'jotai'
 import React from 'react'
-
-interface Data {
-  loading: boolean
-  error: boolean
-  status: number
-  message: string
-  data: any
-  fullRes?: any
-}
+import { StateVal } from './use-api'
 
 interface AtomTypes {
-  [key: string]: Data
+  [key: string]: StateVal
 }
 
 interface ActionTypes {
   key: string
-  value: Data | null
+  value: StateVal | null
 }
 
 export const apiCacheAtom = atom<AtomTypes>({})

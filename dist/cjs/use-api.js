@@ -3,13 +3,22 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.useApi = void 0;
 var tslib_1 = require("tslib");
 /* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable prettier/prettier */
 var apiJotai_js_1 = require("./apiJotai.js");
 var jotai_1 = require("jotai");
 var react_1 = require("react");
-var uuid_1 = require("uuid");
 var feedback_js_1 = require("./feedback.js");
-var key = (0, uuid_1.v4)();
+var generateUUid_js_1 = require("./generateUUid.js");
+var key = (0, generateUUid_js_1.generateUUid)();
 var cacheFunctions = new Map();
+var initialState = {
+    loading: false,
+    error: false,
+    status: null,
+    message: '',
+    data: null,
+    fullRes: null,
+};
 var useApi = function (_a, fun, topSuccessCallback, topErrCallback) {
     var _b = _a.both, both = _b === void 0 ? false : _b, _c = _a.errMsg, errMsg = _c === void 0 ? true : _c, _d = _a.successMsg, successMsg = _d === void 0 ? false : _d, resErrMsg = _a.resErrMsg, resSuccessMsg = _a.resSuccessMsg, cache = _a.cache, fullRes = _a.fullRes, unmount = _a.unmount;
     var setFeedback = (0, jotai_1.useSetAtom)(feedback_js_1.setFeedbackAtom);
@@ -77,11 +86,19 @@ var useApi = function (_a, fun, topSuccessCallback, topErrCallback) {
                     case 1:
                         res = _d.sent();
                         return [3 /*break*/, 4];
-                    case 2: return [4 /*yield*/, fun];
+                    case 2: return [4 /*yield*/, fun
+                        //if res is promise
+                    ];
                     case 3:
                         res = _d.sent();
                         _d.label = 4;
                     case 4:
+                        if (!(res instanceof Function)) return [3 /*break*/, 6];
+                        return [4 /*yield*/, res()];
+                    case 5:
+                        res = _d.sent();
+                        _d.label = 6;
+                    case 6:
                         if (res) {
                             if (!res.error) {
                                 stateVal = {
@@ -155,8 +172,10 @@ var useApi = function (_a, fun, topSuccessCallback, topErrCallback) {
             });
         });
     };
-    if (cache)
+    if (cache && cacheData)
         return [executeApi, tslib_1.__assign(tslib_1.__assign({}, cacheData), { clearCache: clearCache, refetch: refetch })];
+    if (!Object.keys(state).length)
+        return [executeApi, tslib_1.__assign(tslib_1.__assign({}, initialState), { clearCache: clearCache, refetch: refetch })];
     return [executeApi, tslib_1.__assign(tslib_1.__assign({}, state[key]), { clearCache: clearCache, refetch: refetch })];
 };
 exports.useApi = useApi;

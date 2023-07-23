@@ -1,11 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable prettier/prettier */
 import { setApiCacheAtom, useApiCache } from './apiJotai.js'
 import { useSetAtom } from 'jotai'
 import { useEffect, useState } from 'react'
-import { v4 as uuid } from 'uuid'
 import { setFeedbackAtom } from './feedback.js'
+import { generateUUid } from './generateUUid.js'
 
-const key = uuid()
+const key = generateUUid()
 const cacheFunctions = new Map()
 
 interface Props {
@@ -25,40 +26,56 @@ interface Config {
   errMsg?: boolean
 }
 
-interface StateVal {
+export interface StateVal {
   loading: boolean
   error: boolean
-  status: number
+  status: number | null
   message: string
   data: any
   fullRes?: any
 }
 //state has key and value
 interface State {
-  [key: string]: {
+  [key: string]: StateVal
+}
+
+type CallbackState = (state: StateVal) => void
+interface Params {
+  fun: any
+  successCallback?: CallbackState | null
+  errCallback?: CallbackState | null
+  config?: Config
+}
+
+type ReturnType = [
+  (fun: Function, successCallback?: CallbackState, errCallback?: CallbackState, config?: Config) => void,
+  {
     loading: boolean
     error: boolean
-    status: number
+    status: number | null
     message: string
     data: any
     fullRes?: any
-  }
-}
+    clearCache: () => void
+    refetch: () => void
+  },
+]
 
-type CallbackState = (state: StateVal) => StateVal | Promise<any>
-interface Params {
-  fun: () => any | Promise<any>
-  successCallback?: CallbackState
-  errCallback?: CallbackState
-  config?: Config
+const initialState = {
+  loading: false,
+  error: false,
+  status: null,
+  message: '',
+  data: null,
+  fullRes: null,
 }
 
 export const useApi = (
   { both = false, errMsg = true, successMsg = false, resErrMsg, resSuccessMsg, cache, fullRes, unmount }: Props,
-  fun?: () => any | Promise<any>,
+  fun?: any,
   topSuccessCallback?: CallbackState,
   topErrCallback?: CallbackState,
-) => {
+): ReturnType => {
   const setFeedback = useSetAtom(setFeedbackAtom)
   const setApiCache = useSetAtom(setApiCacheAtom)
   const cacheData = useApiCache(cache)
@@ -78,9 +95,9 @@ export const useApi = (
   }, [])
 
   const executeApi = async (
-    fun: () => any | Promise<any>,
-    successCallback?: CallbackState,
-    errCallback?: CallbackState,
+    fun: any,
+    successCallback?: CallbackState | null,
+    errCallback?: CallbackState | null,
     config?: Config,
   ) => {
     processing({ fun, successCallback, errCallback, config })
@@ -126,6 +143,11 @@ export const useApi = (
     //check fun have callback or not
     if (fun instanceof Function) res = await fun()
     else res = await fun
+
+    //if res is promise
+    if (res instanceof Function) {
+      res = await res()
+    }
 
     if (res) {
       if (!res.error) {
@@ -190,7 +212,7 @@ export const useApi = (
     }
   }
 
-  if (cache) return [executeApi, { ...cacheData, clearCache, refetch }]
-
+  if (cache && cacheData) return [executeApi, { ...cacheData, clearCache, refetch }]
+  if (!Object.keys(state).length) return [executeApi, { ...initialState, clearCache, refetch }]
   return [executeApi, { ...state[key], clearCache, refetch }]
 }

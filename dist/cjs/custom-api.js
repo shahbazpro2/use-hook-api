@@ -10,6 +10,7 @@ exports.apiResStructure = {
     errKey: 'message',
     dataKey: 'data',
 };
+var isFunc = function (fun) { return fun instanceof Function; };
 var customApi = function (fun) {
     var errKey = exports.apiResStructure.errKey, dataKey = exports.apiResStructure.dataKey;
     return function apiFun() {
@@ -19,10 +20,18 @@ var customApi = function (fun) {
             return tslib_1.__generator(this, function (_3) {
                 switch (_3.label) {
                     case 0:
-                        _3.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, fun];
+                        _3.trys.push([0, 5, , 6]);
+                        res = null;
+                        if (!isFunc(fun)) return [3 /*break*/, 2];
+                        return [4 /*yield*/, fun()];
                     case 1:
                         res = _3.sent();
+                        return [3 /*break*/, 4];
+                    case 2: return [4 /*yield*/, fun];
+                    case 3:
+                        res = _3.sent();
+                        _3.label = 4;
+                    case 4:
                         if (res === null || res === void 0 ? void 0 : res.error)
                             throw {
                                 response: {
@@ -62,8 +71,8 @@ var customApi = function (fun) {
                                     message: (0, objectToArray_js_1.default)(res.data),
                                     fullRes: res.data,
                                 }];
-                        return [3 /*break*/, 3];
-                    case 2:
+                        return [3 /*break*/, 6];
+                    case 5:
                         err_1 = _3.sent();
                         data = void 0;
                         if (((_l = err_1.response) === null || _l === void 0 ? void 0 : _l.status) === 500) {
@@ -91,7 +100,7 @@ var customApi = function (fun) {
                                 message: (0, objectToArray_js_1.default)((_1 = err_1.response) === null || _1 === void 0 ? void 0 : _1.data),
                             };
                         return [2 /*return*/, tslib_1.__assign(tslib_1.__assign({ error: true }, data), { data: null, fullRes: (_2 = err_1.response) === null || _2 === void 0 ? void 0 : _2.data })];
-                    case 3: return [2 /*return*/];
+                    case 6: return [2 /*return*/];
                 }
             });
         });

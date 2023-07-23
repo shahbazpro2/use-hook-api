@@ -9,11 +9,17 @@ export const apiResStructure = {
   dataKey: 'data',
 }
 
-const customApi = (fun: () => void) => {
+const isFunc = (fun: any) => fun instanceof Function
+const customApi = (fun: any) => {
   const { errKey, dataKey }: typeof apiResStructure = apiResStructure
   return async function apiFun() {
     try {
-      const res: any = await fun
+      let res: any = null
+      if (isFunc(fun)) {
+        res = await fun()
+      } else {
+        res = await fun
+      }
       if (res?.error)
         throw {
           response: {
