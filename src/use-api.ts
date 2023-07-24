@@ -40,15 +40,18 @@ interface State {
 }
 
 type CallbackState = (state: StateVal) => void
+type Fun = () =>
+  | Promise<{ error: boolean; data: null; status: string | number; message: string[] }>
+  | { error: boolean; data: null; status: string | number; message: string[] }
 interface Params {
-  fun: any
+  fun: Fun
   successCallback?: CallbackState | null
   errCallback?: CallbackState | null
   config?: Config
 }
 
 type ReturnType = [
-  (fun: Function, successCallback?: CallbackState, errCallback?: CallbackState, config?: Config) => void,
+  (fun: Fun, successCallback?: CallbackState | null, errCallback?: CallbackState | null, config?: Config) => void,
   {
     loading: boolean
     error: boolean
@@ -72,9 +75,9 @@ const initialState = {
 
 export const useApi = (
   { both = false, errMsg = true, successMsg = false, resErrMsg, resSuccessMsg, cache, fullRes, unmount }: Props,
-  fun?: any,
-  topSuccessCallback?: CallbackState,
-  topErrCallback?: CallbackState,
+  fun?: Fun,
+  topSuccessCallback?: CallbackState | null,
+  topErrCallback?: CallbackState | null,
 ): ReturnType => {
   const setFeedback = useSetAtom(setFeedbackAtom)
   const setApiCache = useSetAtom(setApiCacheAtom)
@@ -95,27 +98,31 @@ export const useApi = (
   }, [])
 
   const executeApi = async (
-    fun: any,
+    fun: Fun,
     successCallback?: CallbackState | null,
     errCallback?: CallbackState | null,
     config?: Config,
   ) => {
+    if (!fun) return
     processing({ fun, successCallback, errCallback, config })
   }
 
   const clearCache = () => {
-    if (cache) {
+    if (cache || key) {
       setApiCache({
-        key: cache,
+        key: cache || key,
         value: null,
       })
-      cacheFunctions.delete(cache)
+      cacheFunctions.delete(cache || key)
+      setState((prevState: State) => ({ ...prevState, [cache || key]: { ...initialState } }))
     }
   }
 
   const refetch = () => {
-    const { fun, successCallback, errCallback, config }: Params = cacheFunctions.get(cache || key)
-    processing({ fun, successCallback, errCallback, config })
+    if (cacheFunctions.get(cache || key)) {
+      const { fun, successCallback, errCallback, config }: Params = cacheFunctions.get(cache || key)
+      processing({ fun, successCallback, errCallback, config })
+    }
   }
 
   const processing = async ({ fun, successCallback, errCallback, config }: Params) => {
@@ -150,30 +157,7 @@ export const useApi = (
     }
 
     if (res) {
-      if (!res.error) {
-        stateVal = {
-          loading: false,
-          error: res.error,
-          status: res.status,
-          message: resSuccessMsg || res.message,
-          data: !res.error ? res.data : null,
-          fullRes: res?.fullRes,
-        }
-
-        if (!fullRes) {
-          delete stateVal.fullRes
-        }
-
-        if (cache) {
-          setApiCache({
-            key: cache,
-            value: { ...stateVal },
-          })
-        } else setState((prevState: State) => ({ ...prevState, [key]: { ...stateVal } }))
-        ;(successMsg || both) &&
-          config?.successMsg !== false &&
-          setFeedback({ message: resSuccessMsg || res.message, type: 'success' })
-      } else if (res.error) {
+      if (res.error) {
         stateVal = {
           loading: false,
           error: res.error,
@@ -200,14 +184,34 @@ export const useApi = (
         }
         if ((errMsg || both) && config?.errMsg !== false)
           setFeedback({ message: resErrMsg || res.message, type: 'error' })
-      }
-      if (!res.error) {
-        if (successCallback) successCallback(stateVal)
-        if (topSuccessCallback) topSuccessCallback(stateVal)
-      }
-      if (res.error) {
+
         if (errCallback) errCallback(stateVal)
         if (topErrCallback) topErrCallback(stateVal)
+      } else {
+        stateVal = {
+          loading: false,
+          error: res.error,
+          status: res.status,
+          message: resSuccessMsg || res.message,
+          data: !res.error ? res.data : null,
+          fullRes: res?.fullRes,
+        }
+
+        if (!fullRes) {
+          delete stateVal.fullRes
+        }
+
+        if (cache) {
+          setApiCache({
+            key: cache,
+            value: { ...stateVal },
+          })
+        } else setState((prevState: State) => ({ ...prevState, [key]: { ...stateVal } }))
+        if ((successMsg || both) && config?.successMsg !== false)
+          setFeedback({ message: resSuccessMsg || res.message, type: 'success' })
+
+        if (successCallback) successCallback(stateVal)
+        if (topSuccessCallback) topSuccessCallback(stateVal)
       }
     }
   }

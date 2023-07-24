@@ -35,22 +35,30 @@ export var useApi = function (_a, fun, topSuccessCallback, topErrCallback) {
     }, []);
     var executeApi = function (fun, successCallback, errCallback, config) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
+            if (!fun)
+                return [2 /*return*/];
             processing({ fun: fun, successCallback: successCallback, errCallback: errCallback, config: config });
             return [2 /*return*/];
         });
     }); };
     var clearCache = function () {
-        if (cache) {
+        if (cache || key) {
             setApiCache({
-                key: cache,
+                key: cache || key,
                 value: null,
             });
-            cacheFunctions.delete(cache);
+            cacheFunctions.delete(cache || key);
+            setState(function (prevState) {
+                var _a;
+                return (__assign(__assign({}, prevState), (_a = {}, _a[cache || key] = __assign({}, initialState), _a)));
+            });
         }
     };
     var refetch = function () {
-        var _a = cacheFunctions.get(cache || key), fun = _a.fun, successCallback = _a.successCallback, errCallback = _a.errCallback, config = _a.config;
-        processing({ fun: fun, successCallback: successCallback, errCallback: errCallback, config: config });
+        if (cacheFunctions.get(cache || key)) {
+            var _a = cacheFunctions.get(cache || key), fun_1 = _a.fun, successCallback = _a.successCallback, errCallback = _a.errCallback, config = _a.config;
+            processing({ fun: fun_1, successCallback: successCallback, errCallback: errCallback, config: config });
+        }
     };
     var processing = function (_a) {
         var fun = _a.fun, successCallback = _a.successCallback, errCallback = _a.errCallback, config = _a.config;
@@ -97,34 +105,7 @@ export var useApi = function (_a, fun, topSuccessCallback, topErrCallback) {
                         _d.label = 6;
                     case 6:
                         if (res) {
-                            if (!res.error) {
-                                stateVal = {
-                                    loading: false,
-                                    error: res.error,
-                                    status: res.status,
-                                    message: resSuccessMsg || res.message,
-                                    data: !res.error ? res.data : null,
-                                    fullRes: res === null || res === void 0 ? void 0 : res.fullRes,
-                                };
-                                if (!fullRes) {
-                                    delete stateVal.fullRes;
-                                }
-                                if (cache) {
-                                    setApiCache({
-                                        key: cache,
-                                        value: __assign({}, stateVal),
-                                    });
-                                }
-                                else
-                                    setState(function (prevState) {
-                                        var _a;
-                                        return (__assign(__assign({}, prevState), (_a = {}, _a[key] = __assign({}, stateVal), _a)));
-                                    });
-                                (successMsg || both) &&
-                                    (config === null || config === void 0 ? void 0 : config.successMsg) !== false &&
-                                    setFeedback({ message: resSuccessMsg || res.message, type: 'success' });
-                            }
-                            else if (res.error) {
+                            if (res.error) {
                                 stateVal = {
                                     loading: false,
                                     error: res.error,
@@ -150,18 +131,40 @@ export var useApi = function (_a, fun, topSuccessCallback, topErrCallback) {
                                 }
                                 if ((errMsg || both) && (config === null || config === void 0 ? void 0 : config.errMsg) !== false)
                                     setFeedback({ message: resErrMsg || res.message, type: 'error' });
-                            }
-                            if (!res.error) {
-                                if (successCallback)
-                                    successCallback(stateVal);
-                                if (topSuccessCallback)
-                                    topSuccessCallback(stateVal);
-                            }
-                            if (res.error) {
                                 if (errCallback)
                                     errCallback(stateVal);
                                 if (topErrCallback)
                                     topErrCallback(stateVal);
+                            }
+                            else {
+                                stateVal = {
+                                    loading: false,
+                                    error: res.error,
+                                    status: res.status,
+                                    message: resSuccessMsg || res.message,
+                                    data: !res.error ? res.data : null,
+                                    fullRes: res === null || res === void 0 ? void 0 : res.fullRes,
+                                };
+                                if (!fullRes) {
+                                    delete stateVal.fullRes;
+                                }
+                                if (cache) {
+                                    setApiCache({
+                                        key: cache,
+                                        value: __assign({}, stateVal),
+                                    });
+                                }
+                                else
+                                    setState(function (prevState) {
+                                        var _a;
+                                        return (__assign(__assign({}, prevState), (_a = {}, _a[key] = __assign({}, stateVal), _a)));
+                                    });
+                                if ((successMsg || both) && (config === null || config === void 0 ? void 0 : config.successMsg) !== false)
+                                    setFeedback({ message: resSuccessMsg || res.message, type: 'success' });
+                                if (successCallback)
+                                    successCallback(stateVal);
+                                if (topSuccessCallback)
+                                    topSuccessCallback(stateVal);
                             }
                         }
                         return [2 /*return*/];

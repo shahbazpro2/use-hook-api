@@ -22,8 +22,19 @@ export interface StateVal {
     fullRes?: any;
 }
 type CallbackState = (state: StateVal) => void;
+type Fun = () => Promise<{
+    error: boolean;
+    data: null;
+    status: string | number;
+    message: string[];
+}> | {
+    error: boolean;
+    data: null;
+    status: string | number;
+    message: string[];
+};
 type ReturnType = [
-    (fun: Function, successCallback?: CallbackState, errCallback?: CallbackState, config?: Config) => void,
+    (fun: Fun, successCallback?: CallbackState | null, errCallback?: CallbackState | null, config?: Config) => void,
     {
         loading: boolean;
         error: boolean;
@@ -35,5 +46,5 @@ type ReturnType = [
         refetch: () => void;
     }
 ];
-export declare const useApi: ({ both, errMsg, successMsg, resErrMsg, resSuccessMsg, cache, fullRes, unmount }: Props, fun?: any, topSuccessCallback?: CallbackState, topErrCallback?: CallbackState) => ReturnType;
+export declare const useApi: ({ both, errMsg, successMsg, resErrMsg, resSuccessMsg, cache, fullRes, unmount }: Props, fun?: Fun, topSuccessCallback?: CallbackState | null, topErrCallback?: CallbackState | null) => ReturnType;
 export {};
