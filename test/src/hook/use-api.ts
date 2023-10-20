@@ -1,10 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable prettier/prettier */
-import { setApiCacheAtom, useApiCache } from './apiJotai.js'
 import { useSetAtom } from 'jotai'
 import { useEffect, useState } from 'react'
-import { setFeedbackAtom } from './feedback.js'
-import { generateUUid } from './generateUUid.js'
+import { setApiCacheAtom, useApiCache } from './apiJotai'
+import { generateUUid } from './generateUUid'
+import { setFeedbackAtom } from './feedback'
 
 const key = generateUUid()
 const cacheFunctions = new Map()
@@ -85,6 +84,9 @@ export const useApi = (
   const cacheData = useApiCache(cache)
   const [state, setState] = useState<State>({})
 
+  console.log('state', state)
+  console.log('cacheData', cacheData)
+
   useEffect(() => {
     if (fun) {
       processing({ fun })
@@ -95,7 +97,7 @@ export const useApi = (
         clearCache()
       }
     }
-    return () => {}
+    return () => { }
   }, [])
 
   const executeApi = async (
@@ -112,7 +114,7 @@ export const useApi = (
     if (cache || key) {
       setApiCache({
         key: cache || key,
-        value: null,
+        value: initialState,
       })
       cacheFunctions.delete(cache || key)
       setState((prevState: State) => ({ ...prevState, [cache || key]: { ...initialState } }))

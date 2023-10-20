@@ -60,6 +60,20 @@ export var useApi = function (_a, fun, topSuccessCallback, topErrCallback) {
             processing({ fun: fun_1, successCallback: successCallback, errCallback: errCallback, config: config });
         }
     };
+    var setCacheData = function (data) {
+        if (cache) {
+            setApiCache({
+                key: cache,
+                value: __assign(__assign({}, cacheData), { data: data }),
+            });
+        }
+        else {
+            setState(function (prevState) {
+                var _a;
+                return (__assign(__assign({}, prevState), (_a = {}, _a[cache || key] = __assign(__assign({}, prevState[cache || key]), data), _a)));
+            });
+        }
+    };
     var processing = function (_a) {
         var fun = _a.fun, successCallback = _a.successCallback, errCallback = _a.errCallback, config = _a.config;
         return __awaiter(void 0, void 0, void 0, function () {
@@ -173,9 +187,9 @@ export var useApi = function (_a, fun, topSuccessCallback, topErrCallback) {
         });
     };
     if (cache && cacheData)
-        return [executeApi, __assign(__assign({}, cacheData), { clearCache: clearCache, refetch: refetch })];
+        return [executeApi, __assign(__assign({}, cacheData), { clearCache: clearCache, refetch: refetch, setCacheData: setCacheData })];
     if (!Object.keys(state).length)
-        return [executeApi, __assign(__assign({}, initialState), { clearCache: clearCache, refetch: refetch })];
-    return [executeApi, __assign(__assign({}, state[key]), { clearCache: clearCache, refetch: refetch })];
+        return [executeApi, __assign(__assign({}, initialState), { clearCache: clearCache, refetch: refetch, setCacheData: setCacheData })];
+    return [executeApi, __assign(__assign({}, state[key]), { clearCache: clearCache, refetch: refetch, setCacheData: setCacheData })];
 };
 //# sourceMappingURL=use-api.js.map

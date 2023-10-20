@@ -63,6 +63,20 @@ var useApi = function (_a, fun, topSuccessCallback, topErrCallback) {
             processing({ fun: fun_1, successCallback: successCallback, errCallback: errCallback, config: config });
         }
     };
+    var setCacheData = function (data) {
+        if (cache) {
+            setApiCache({
+                key: cache,
+                value: tslib_1.__assign(tslib_1.__assign({}, cacheData), { data: data }),
+            });
+        }
+        else {
+            setState(function (prevState) {
+                var _a;
+                return (tslib_1.__assign(tslib_1.__assign({}, prevState), (_a = {}, _a[cache || key] = tslib_1.__assign(tslib_1.__assign({}, prevState[cache || key]), data), _a)));
+            });
+        }
+    };
     var processing = function (_a) {
         var fun = _a.fun, successCallback = _a.successCallback, errCallback = _a.errCallback, config = _a.config;
         return tslib_1.__awaiter(void 0, void 0, void 0, function () {
@@ -176,10 +190,10 @@ var useApi = function (_a, fun, topSuccessCallback, topErrCallback) {
         });
     };
     if (cache && cacheData)
-        return [executeApi, tslib_1.__assign(tslib_1.__assign({}, cacheData), { clearCache: clearCache, refetch: refetch })];
+        return [executeApi, tslib_1.__assign(tslib_1.__assign({}, cacheData), { clearCache: clearCache, refetch: refetch, setCacheData: setCacheData })];
     if (!Object.keys(state).length)
-        return [executeApi, tslib_1.__assign(tslib_1.__assign({}, initialState), { clearCache: clearCache, refetch: refetch })];
-    return [executeApi, tslib_1.__assign(tslib_1.__assign({}, state[key]), { clearCache: clearCache, refetch: refetch })];
+        return [executeApi, tslib_1.__assign(tslib_1.__assign({}, initialState), { clearCache: clearCache, refetch: refetch, setCacheData: setCacheData })];
+    return [executeApi, tslib_1.__assign(tslib_1.__assign({}, state[key]), { clearCache: clearCache, refetch: refetch, setCacheData: setCacheData })];
 };
 exports.useApi = useApi;
 //# sourceMappingURL=use-api.js.map

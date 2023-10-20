@@ -44,6 +44,7 @@ type ReturnType = [
         fullRes?: any;
         clearCache: () => void;
         refetch: () => void;
+        setCacheData: (data: any) => void;
     }
 ];
 export declare const useApi: ({ both, errMsg, successMsg, resErrMsg, resSuccessMsg, cache, fullRes, unmount }: Props, fun?: Fun, topSuccessCallback?: CallbackState | null, topErrCallback?: CallbackState | null) => ReturnType;
