@@ -95,7 +95,7 @@ export const useApi = (
         clearCache()
       }
     }
-    return () => { }
+    return () => {}
   }, [])
 
   const executeApi = async (
