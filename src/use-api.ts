@@ -95,7 +95,7 @@ export const useApi = (
         clearCache()
       }
     }
-    return () => {}
+    return () => { }
   }, [])
 
   const executeApi = async (
@@ -144,11 +144,12 @@ export const useApi = (
     cacheFunctions.set(cache || key, { fun, successCallback, errCallback, config })
     let stateVal = {
       ...state[cache || key],
+      apiLoading: config?.loading ?? true,
       loading: config?.loading ?? true,
     }
 
     if (cacheData?.loading === false) {
-      stateVal = { ...cacheData, loading: config?.loading ?? false }
+      stateVal = { ...cacheData, loading: config?.loading ?? false, apiLoading: config?.loading ?? true }
     }
 
     if (config?.loading !== false) {
@@ -174,6 +175,7 @@ export const useApi = (
     if (res) {
       if (res.error) {
         stateVal = {
+          apiLoading: false,
           loading: false,
           error: res.error,
           status: res.status,
@@ -204,6 +206,7 @@ export const useApi = (
         if (topErrCallback) topErrCallback(stateVal)
       } else {
         stateVal = {
+          apiLoading: false,
           loading: false,
           error: res.error,
           status: res.status,
