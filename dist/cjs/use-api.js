@@ -81,14 +81,14 @@ var useApi = function (_a, fun, topSuccessCallback, topErrCallback) {
         var fun = _a.fun, successCallback = _a.successCallback, errCallback = _a.errCallback, config = _a.config;
         return tslib_1.__awaiter(void 0, void 0, void 0, function () {
             var stateVal, res;
-            var _b, _c;
-            return tslib_1.__generator(this, function (_d) {
-                switch (_d.label) {
+            var _b, _c, _d, _e;
+            return tslib_1.__generator(this, function (_f) {
+                switch (_f.label) {
                     case 0:
                         cacheFunctions.set(cache || key, { fun: fun, successCallback: successCallback, errCallback: errCallback, config: config });
-                        stateVal = tslib_1.__assign(tslib_1.__assign({}, state[cache || key]), { loading: (_b = config === null || config === void 0 ? void 0 : config.loading) !== null && _b !== void 0 ? _b : true });
+                        stateVal = tslib_1.__assign(tslib_1.__assign({}, state[cache || key]), { apiLoading: (_b = config === null || config === void 0 ? void 0 : config.loading) !== null && _b !== void 0 ? _b : true, loading: (_c = config === null || config === void 0 ? void 0 : config.loading) !== null && _c !== void 0 ? _c : true });
                         if ((cacheData === null || cacheData === void 0 ? void 0 : cacheData.loading) === false) {
-                            stateVal = tslib_1.__assign(tslib_1.__assign({}, cacheData), { loading: (_c = config === null || config === void 0 ? void 0 : config.loading) !== null && _c !== void 0 ? _c : false });
+                            stateVal = tslib_1.__assign(tslib_1.__assign({}, cacheData), { loading: (_d = config === null || config === void 0 ? void 0 : config.loading) !== null && _d !== void 0 ? _d : false, apiLoading: (_e = config === null || config === void 0 ? void 0 : config.loading) !== null && _e !== void 0 ? _e : true });
                         }
                         if ((config === null || config === void 0 ? void 0 : config.loading) !== false) {
                             if (cache)
@@ -106,24 +106,25 @@ var useApi = function (_a, fun, topSuccessCallback, topErrCallback) {
                         if (!(fun instanceof Function)) return [3 /*break*/, 2];
                         return [4 /*yield*/, fun()];
                     case 1:
-                        res = _d.sent();
+                        res = _f.sent();
                         return [3 /*break*/, 4];
                     case 2: return [4 /*yield*/, fun
                         //if res is promise
                     ];
                     case 3:
-                        res = _d.sent();
-                        _d.label = 4;
+                        res = _f.sent();
+                        _f.label = 4;
                     case 4:
                         if (!(res instanceof Function)) return [3 /*break*/, 6];
                         return [4 /*yield*/, res()];
                     case 5:
-                        res = _d.sent();
-                        _d.label = 6;
+                        res = _f.sent();
+                        _f.label = 6;
                     case 6:
                         if (res) {
                             if (res.error) {
                                 stateVal = {
+                                    apiLoading: false,
                                     loading: false,
                                     error: res.error,
                                     status: res.status,
@@ -155,6 +156,7 @@ var useApi = function (_a, fun, topSuccessCallback, topErrCallback) {
                             }
                             else {
                                 stateVal = {
+                                    apiLoading: false,
                                     loading: false,
                                     error: res.error,
                                     status: res.status,
