@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { atom, useAtomValue, useSetAtom } from 'jotai'
 import { useMemo } from 'react'
 
 interface FeedbackType {
