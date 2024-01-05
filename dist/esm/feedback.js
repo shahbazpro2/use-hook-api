@@ -28,6 +28,9 @@ export var useFeedbackState = function () {
     var clearFeedback = useMemo(function () {
         return function () { return clearState(); };
     }, []);
-    return [feedbackState, clearFeedback];
+    return {
+        feedbackState: feedbackState,
+        clearFeedback: clearFeedback,
+    };
 };
 //# sourceMappingURL=feedback.js.map

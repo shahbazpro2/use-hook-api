@@ -32,7 +32,10 @@ var useFeedbackState = function () {
     var clearFeedback = (0, react_1.useMemo)(function () {
         return function () { return clearState(); };
     }, []);
-    return [feedbackState, clearFeedback];
+    return {
+        feedbackState: feedbackState,
+        clearFeedback: clearFeedback,
+    };
 };
 exports.useFeedbackState = useFeedbackState;
 //# sourceMappingURL=feedback.js.map

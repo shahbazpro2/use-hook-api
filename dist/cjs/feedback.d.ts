@@ -13,5 +13,8 @@ export declare const clearFeedbackAtom: import("jotai").WritableAtom<null, [], v
     init: null;
 };
 export declare const useSetFeedback: () => (payload: SetFeedbackType) => void;
-export declare const useFeedbackState: () => (FeedbackType | (() => void))[];
+export declare const useFeedbackState: () => {
+    feedbackState: FeedbackType;
+    clearFeedback: () => void;
+};
 export {};
