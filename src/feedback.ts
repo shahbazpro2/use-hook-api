@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { atom, useAtom, useSetAtom } from 'jotai'
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useMemo } from 'react'
 
 interface FeedbackType {
@@ -35,7 +35,7 @@ export const useSetFeedback = () => {
 }
 
 export const useFeedbackState = () => {
-  const [feedbackState] = useAtom(feedbackAtom)
+  const feedbackState = useAtomValue(feedbackAtom)
   const clearState = useSetAtom(clearFeedbackAtom)
 
   const clearFeedback = useMemo(() => {
