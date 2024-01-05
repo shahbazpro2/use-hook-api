@@ -1,8 +1,8 @@
 interface FeedbackType {
-    message: string | null;
+    message: string[] | null;
     type: string;
 }
-type SetFeedbackType = [string | null, string];
+type SetFeedbackType = [string[] | null, string];
 export declare const feedbackAtom: import("jotai").PrimitiveAtom<FeedbackType> & {
     init: FeedbackType;
 };
