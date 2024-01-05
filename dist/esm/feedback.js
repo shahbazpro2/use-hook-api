@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { atom, useAtom, useSetAtom } from 'jotai';
+import { atom, useAtomValue, useSetAtom } from 'jotai';
 import { useMemo } from 'react';
 export var feedbackAtom = atom({
     message: null,
@@ -23,7 +23,7 @@ export var useSetFeedback = function () {
     }, []);
 };
 export var useFeedbackState = function () {
-    var feedbackState = useAtom(feedbackAtom)[0];
+    var feedbackState = useAtomValue(feedbackAtom);
     var clearState = useSetAtom(clearFeedbackAtom);
     var clearFeedback = useMemo(function () {
         return function () { return clearState(); };

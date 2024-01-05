@@ -27,7 +27,7 @@ var useSetFeedback = function () {
 };
 exports.useSetFeedback = useSetFeedback;
 var useFeedbackState = function () {
-    var feedbackState = (0, jotai_1.useAtom)(exports.feedbackAtom)[0];
+    var feedbackState = (0, jotai_1.useAtomValue)(exports.feedbackAtom);
     var clearState = (0, jotai_1.useSetAtom)(exports.clearFeedbackAtom);
     var clearFeedback = (0, react_1.useMemo)(function () {
         return function () { return clearState(); };
