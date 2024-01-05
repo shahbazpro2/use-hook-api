@@ -42,5 +42,8 @@ export const useFeedbackState = () => {
     return () => clearState()
   }, [])
 
-  return [feedbackState, clearFeedback]
+  return {
+    feedbackState,
+    clearFeedback,
+  }
 }
