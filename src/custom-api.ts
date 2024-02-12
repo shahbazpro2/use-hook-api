@@ -9,6 +9,8 @@ export const apiResStructure = {
   dataKey: 'data',
 }
 
+export const excludeErrorKeys: string[] = []
+
 const isFunc = (fun: any) => fun instanceof Function
 const customApi = (fun: any) => {
   const { errKey, dataKey }: typeof apiResStructure = apiResStructure
@@ -33,7 +35,7 @@ const customApi = (fun: any) => {
           error: false,
           status: res.status,
           data: res.data?.[dataKey] || res.data?.data,
-          message: objectToArray(res.data?.[errKey] || res.data?.message),
+          message: objectToArray({ obj: res.data?.[errKey] || res.data?.message, excludeErrorKeys }),
           fullRes: res.data,
         }
       else if (allKeysExist(res.data, [`${errKey}||message`]))
@@ -41,7 +43,7 @@ const customApi = (fun: any) => {
           error: false,
           status: res.status,
           data: res.data,
-          message: objectToArray(res.data?.[errKey] || res.data?.message),
+          message: objectToArray({ obj: res.data?.[errKey] || res.data?.message, excludeErrorKeys }),
           fullRes: res.data,
         }
       else if (allKeysExist(res.data, [`${dataKey}||data`]))
@@ -49,7 +51,7 @@ const customApi = (fun: any) => {
           error: false,
           status: res.status,
           data: res.data?.[dataKey] || res.data?.data,
-          message: objectToArray(res.data?.[dataKey] || res.data?.data),
+          message: objectToArray({ obj: res.data?.[dataKey] || res.data?.data, excludeErrorKeys }),
           fullRes: res.data,
         }
       else
@@ -57,7 +59,7 @@ const customApi = (fun: any) => {
           error: false,
           status: res.status,
           data: res.data,
-          message: objectToArray(res.data),
+          message: objectToArray({ obj: res.data, excludeErrorKeys }),
           fullRes: res.data,
         }
     } catch (err: any) {
@@ -72,17 +74,20 @@ const customApi = (fun: any) => {
       } else if (allKeysExist(err.response?.data, [`${errKey}||message`]))
         data = {
           status: err.response?.status,
-          message: objectToArray(err.response?.data?.[errKey] || err.response?.data?.message),
+          message: objectToArray({
+            obj: err.response?.data?.[errKey] || err.response?.data?.message,
+            excludeErrorKeys,
+          }),
         }
       else if (allKeysExist(err.response?.data, [`${dataKey}||data`]))
         data = {
           status: err.response?.status,
-          message: objectToArray(err.response?.data?.[dataKey] || err.response?.data?.data),
+          message: objectToArray({ obj: err.response?.data?.[dataKey] || err.response?.data?.data, excludeErrorKeys }),
         }
       else
         data = {
           status: err.response?.status,
-          message: objectToArray(err.response?.data),
+          message: objectToArray({ obj: err.response?.data, excludeErrorKeys }),
         }
 
       return { error: true, ...data, data: null, fullRes: err.response?.data }
