@@ -4,7 +4,7 @@ import { atom, useAtom } from 'jotai';
 import React from 'react';
 export var apiCacheAtom = atom({});
 export var excludeErrorKeysAtom = atom([]);
-export var setExcludeErrorKeys = atom(null, function (get, set, update) {
+export var setExcludeErrorKeys = atom(null, function (_, set, update) {
     set(excludeErrorKeysAtom, update);
 });
 export var setApiCacheAtom = atom(null, function (get, set, action) {

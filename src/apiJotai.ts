@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { atom, useAtom } from 'jotai'
+import { atom, useAtom, useSetAtom } from 'jotai'
 import React from 'react'
 import { StateVal } from './use-api'
 
@@ -15,9 +15,10 @@ interface ActionTypes {
 export const apiCacheAtom = atom<AtomTypes>({})
 export const excludeErrorKeysAtom = atom<string[]>([])
 
-export const setExcludeErrorKeys = atom(null, (_, set, update: string[]) => {
-  set(excludeErrorKeysAtom, update)
-})
+export const useSetExcludeErrorKeys = () => {
+  const setExcludeErrorKeys = useSetAtom(excludeErrorKeysAtom)
+  return setExcludeErrorKeys
+}
 
 export const setApiCacheAtom = atom(null, (get, set, action: ActionTypes) => {
   const cache = get(apiCacheAtom)
