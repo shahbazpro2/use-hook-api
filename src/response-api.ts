@@ -11,6 +11,7 @@ export const apiResStructure = {
   errKey: 'message',
   dataKey: 'data',
 }
+export const excludeErrorKeys: string[] = []
 
 export const allKeysExist = (obj: any, keys: any = []) => {
   return keys.every((key: any) => {
@@ -41,7 +42,7 @@ const responseApi = (url: string, method: string, data: any, headerData: any = {
           error: false,
           status: res.status,
           data: res.data?.[dataKey] || res.data?.data,
-          message: objectToArray(res.data?.[errKey] || res.data?.message),
+          message: objectToArray({ obj: res.data?.[errKey] || res.data?.message, excludeErrorKeys }),
           fullRes: res.data,
         }
       else if (allKeysExist(res.data, [`${errKey}||message`]))
@@ -49,7 +50,7 @@ const responseApi = (url: string, method: string, data: any, headerData: any = {
           error: false,
           status: res.status,
           data: res.data,
-          message: objectToArray(res.data?.[errKey] || res.data?.message),
+          message: objectToArray({ obj: res.data?.[errKey] || res.data?.message, excludeErrorKeys }),
           fullRes: res.data,
         }
       else if (allKeysExist(res.data, [`${dataKey}||data`]))
@@ -57,11 +58,17 @@ const responseApi = (url: string, method: string, data: any, headerData: any = {
           error: false,
           status: res.status,
           data: res.data?.[dataKey] || res.data?.data,
-          message: objectToArray(res.data?.[dataKey] || res.data?.data),
+          message: objectToArray({ obj: res.data?.[dataKey] || res.data?.data, excludeErrorKeys }),
           fullRes: res.data,
         }
       else
-        return { error: false, status: res.status, data: res.data, message: objectToArray(res.data), fullRes: res.data }
+        return {
+          error: false,
+          status: res.status,
+          data: res.data,
+          message: objectToArray({ obj: res.data, excludeErrorKeys }),
+          fullRes: res.data,
+        }
     } catch (err: any) {
       let data
       if (err.response?.status === 500) {
@@ -71,14 +78,18 @@ const responseApi = (url: string, method: string, data: any, headerData: any = {
       } else if (allKeysExist(err.response?.data, [`${errKey}||message`]))
         data = {
           status: err.response?.status,
-          message: objectToArray(err.response?.data?.[errKey] || err.response?.data?.message),
+          message: objectToArray({
+            obj: err.response?.data?.[errKey] || err.response?.data?.message,
+            excludeErrorKeys,
+          }),
         }
       else if (allKeysExist(err.response?.data, [`${dataKey}||data`]))
         data = {
           status: err.response?.status,
-          message: objectToArray(err.response?.data?.[dataKey] || err.response?.data?.data),
+          message: objectToArray({ obj: err.response?.data?.[dataKey] || err.response?.data?.data, excludeErrorKeys }),
         }
-      else data = { status: err.response?.status, message: objectToArray(err.response?.data) }
+      else
+        data = { status: err.response?.status, message: objectToArray({ obj: err.response?.data, excludeErrorKeys }) }
 
       return { error: true, ...data, data: null, fullRes: err.response?.data }
     }
