@@ -15,7 +15,7 @@ interface ActionTypes {
 export const apiCacheAtom = atom<AtomTypes>({})
 export const excludeErrorKeysAtom = atom<string[]>([])
 
-export const setExcludeErrorKeys = atom(null, (get, set, update: string[]) => {
+export const setExcludeErrorKeys = atom(null, (_, set, update: string[]) => {
   set(excludeErrorKeysAtom, update)
 })
 

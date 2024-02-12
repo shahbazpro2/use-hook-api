@@ -2,6 +2,8 @@
 /* eslint-disable no-undef */
 import { __assign, __awaiter, __generator } from "tslib";
 import axios from 'axios';
+import { useAtomValue } from 'jotai';
+import { excludeErrorKeysAtom } from './apiJotai.js';
 import objectToArray from './objectToArray.js';
 var CancelToken = axios.CancelToken;
 export var cancelRequest = null;
@@ -10,7 +12,6 @@ export var apiResStructure = {
     errKey: 'message',
     dataKey: 'data',
 };
-export var excludeErrorKeys = [];
 export var allKeysExist = function (obj, keys) {
     if (keys === void 0) { keys = []; }
     return keys.every(function (key) {
@@ -21,8 +22,9 @@ export var allKeysExist = function (obj, keys) {
         return false;
     });
 };
-var responseApi = function (url, method, data, headerData) {
+var ResponseApi = function (url, method, data, headerData) {
     if (headerData === void 0) { headerData = {}; }
+    var excludeErrorKeys = useAtomValue(excludeErrorKeysAtom);
     var errKey = apiResStructure.errKey, dataKey = apiResStructure.dataKey;
     return function apiFun() {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2;
@@ -106,5 +108,5 @@ var responseApi = function (url, method, data, headerData) {
         });
     };
 };
-export default responseApi;
+export default ResponseApi;
 //# sourceMappingURL=response-api.js.map
