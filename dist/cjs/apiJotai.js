@@ -4,12 +4,14 @@ exports.useApiCache = exports.getApiCache = exports.setExistingCacheAtom = expor
 var tslib_1 = require("tslib");
 /* eslint-disable react-hooks/exhaustive-deps */
 var jotai_1 = require("jotai");
-var react_1 = tslib_1.__importDefault(require("react"));
+var react_1 = tslib_1.__importStar(require("react"));
 exports.apiCacheAtom = (0, jotai_1.atom)({});
 exports.excludeErrorKeysAtom = (0, jotai_1.atom)([]);
 var useSetExcludeErrorKeys = function () {
     var setExcludeErrorKeys = (0, jotai_1.useSetAtom)(exports.excludeErrorKeysAtom);
-    return setExcludeErrorKeys;
+    return (0, react_1.useMemo)(function () {
+        return function (payload) { return setExcludeErrorKeys(payload); };
+    }, []);
 };
 exports.useSetExcludeErrorKeys = useSetExcludeErrorKeys;
 exports.setApiCacheAtom = (0, jotai_1.atom)(null, function (get, set, action) {

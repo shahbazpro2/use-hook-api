@@ -12,7 +12,7 @@ export declare const apiCacheAtom: import("jotai").PrimitiveAtom<AtomTypes> & {
 export declare const excludeErrorKeysAtom: import("jotai").PrimitiveAtom<string[]> & {
     init: string[];
 };
-export declare const useSetExcludeErrorKeys: () => (args_0: string[] | ((prev: string[]) => string[])) => void;
+export declare const useSetExcludeErrorKeys: () => (payload: string[]) => void;
 export declare const setApiCacheAtom: import("jotai").WritableAtom<null, [action: ActionTypes], void> & {
     init: null;
 };

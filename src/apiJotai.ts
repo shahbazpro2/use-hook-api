@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { atom, useAtom, useSetAtom } from 'jotai'
-import React, { useMemo } from 'react'
+import { atom, useAtom } from 'jotai'
+import React from 'react'
 import { StateVal } from './use-api'
 
 interface AtomTypes {
@@ -13,15 +13,6 @@ interface ActionTypes {
 }
 
 export const apiCacheAtom = atom<AtomTypes>({})
-export const excludeErrorKeysAtom = atom<string[]>([])
-
-export const useSetExcludeErrorKeys = () => {
-  const setExcludeErrorKeys = useSetAtom(excludeErrorKeysAtom)
-
-  return useMemo(() => {
-    return (payload: string[]) => setExcludeErrorKeys(payload)
-  }, [])
-}
 
 export const setApiCacheAtom = atom(null, (get, set, action: ActionTypes) => {
   const cache = get(apiCacheAtom)

@@ -1,12 +1,14 @@
 import { __assign } from "tslib";
 /* eslint-disable react-hooks/exhaustive-deps */
 import { atom, useAtom, useSetAtom } from 'jotai';
-import React from 'react';
+import React, { useMemo } from 'react';
 export var apiCacheAtom = atom({});
 export var excludeErrorKeysAtom = atom([]);
 export var useSetExcludeErrorKeys = function () {
     var setExcludeErrorKeys = useSetAtom(excludeErrorKeysAtom);
-    return setExcludeErrorKeys;
+    return useMemo(function () {
+        return function (payload) { return setExcludeErrorKeys(payload); };
+    }, []);
 };
 export var setApiCacheAtom = atom(null, function (get, set, action) {
     var _a;
