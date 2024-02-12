@@ -1,15 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.useApiCache = exports.getApiCache = exports.setExistingCacheAtom = exports.setApiCacheAtom = exports.setExcludeErrorKeys = exports.excludeErrorKeysAtom = exports.apiCacheAtom = void 0;
+exports.useApiCache = exports.getApiCache = exports.setExistingCacheAtom = exports.setApiCacheAtom = exports.useSetExcludeErrorKeys = exports.excludeErrorKeysAtom = exports.apiCacheAtom = void 0;
 var tslib_1 = require("tslib");
 /* eslint-disable react-hooks/exhaustive-deps */
 var jotai_1 = require("jotai");
 var react_1 = tslib_1.__importDefault(require("react"));
 exports.apiCacheAtom = (0, jotai_1.atom)({});
 exports.excludeErrorKeysAtom = (0, jotai_1.atom)([]);
-exports.setExcludeErrorKeys = (0, jotai_1.atom)(null, function (_, set, update) {
-    set(exports.excludeErrorKeysAtom, update);
-});
+var useSetExcludeErrorKeys = function () {
+    var setExcludeErrorKeys = (0, jotai_1.useSetAtom)(exports.excludeErrorKeysAtom);
+    return setExcludeErrorKeys;
+};
+exports.useSetExcludeErrorKeys = useSetExcludeErrorKeys;
 exports.setApiCacheAtom = (0, jotai_1.atom)(null, function (get, set, action) {
     var _a;
     var cache = get(exports.apiCacheAtom);
