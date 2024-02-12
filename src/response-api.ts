@@ -2,6 +2,8 @@
 /* eslint-disable no-undef */
 
 import axios from 'axios'
+import { useAtomValue } from 'jotai'
+import { excludeErrorKeysAtom } from './apiJotai.js'
 import objectToArray from './objectToArray.js'
 const CancelToken = axios.CancelToken
 export let cancelRequest: any = null
@@ -11,7 +13,6 @@ export const apiResStructure = {
   errKey: 'message',
   dataKey: 'data',
 }
-export const excludeErrorKeys: string[] = []
 
 export const allKeysExist = (obj: any, keys: any = []) => {
   return keys.every((key: any) => {
@@ -23,7 +24,8 @@ export const allKeysExist = (obj: any, keys: any = []) => {
   })
 }
 
-const responseApi = (url: string, method: string, data: any, headerData: any = {}) => {
+const ResponseApi = (url: string, method: string, data: any, headerData: any = {}) => {
+  const excludeErrorKeys = useAtomValue(excludeErrorKeysAtom)
   const { errKey, dataKey }: typeof apiResStructure = apiResStructure
   return async function apiFun() {
     try {
@@ -96,4 +98,4 @@ const responseApi = (url: string, method: string, data: any, headerData: any = {
   }
 }
 
-export default responseApi
+export default ResponseApi

@@ -1,8 +1,8 @@
-export declare const apiResStructure: {
+export declare const customApiResStructure: {
     errKey: string;
     dataKey: string;
 };
-export declare const excludeErrorKeys: string[];
+export declare const customExcludeErrorKeys: string[];
 declare const customApi: (fun: any) => () => Promise<{
     error: boolean;
     status: any;

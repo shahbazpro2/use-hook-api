@@ -2,18 +2,18 @@
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable no-undef */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.excludeErrorKeys = exports.apiResStructure = void 0;
+exports.customExcludeErrorKeys = exports.customApiResStructure = void 0;
 var tslib_1 = require("tslib");
 var objectToArray_js_1 = tslib_1.__importDefault(require("./objectToArray.js"));
 var response_api_js_1 = require("./response-api.js");
-exports.apiResStructure = {
+exports.customApiResStructure = {
     errKey: 'message',
     dataKey: 'data',
 };
-exports.excludeErrorKeys = [];
+exports.customExcludeErrorKeys = [];
 var isFunc = function (fun) { return fun instanceof Function; };
 var customApi = function (fun) {
-    var errKey = exports.apiResStructure.errKey, dataKey = exports.apiResStructure.dataKey;
+    var errKey = exports.customApiResStructure.errKey, dataKey = exports.customApiResStructure.dataKey;
     return function apiFun() {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2;
         return tslib_1.__awaiter(this, void 0, void 0, function () {
@@ -45,7 +45,10 @@ var customApi = function (fun) {
                                     error: false,
                                     status: res.status,
                                     data: ((_a = res.data) === null || _a === void 0 ? void 0 : _a[dataKey]) || ((_b = res.data) === null || _b === void 0 ? void 0 : _b.data),
-                                    message: (0, objectToArray_js_1.default)({ obj: ((_c = res.data) === null || _c === void 0 ? void 0 : _c[errKey]) || ((_d = res.data) === null || _d === void 0 ? void 0 : _d.message), excludeErrorKeys: exports.excludeErrorKeys }),
+                                    message: (0, objectToArray_js_1.default)({
+                                        obj: ((_c = res.data) === null || _c === void 0 ? void 0 : _c[errKey]) || ((_d = res.data) === null || _d === void 0 ? void 0 : _d.message),
+                                        excludeErrorKeys: exports.customExcludeErrorKeys,
+                                    }),
                                     fullRes: res.data,
                                 }];
                         else if ((0, response_api_js_1.allKeysExist)(res.data, ["".concat(errKey, "||message")]))
@@ -53,7 +56,10 @@ var customApi = function (fun) {
                                     error: false,
                                     status: res.status,
                                     data: res.data,
-                                    message: (0, objectToArray_js_1.default)({ obj: ((_e = res.data) === null || _e === void 0 ? void 0 : _e[errKey]) || ((_f = res.data) === null || _f === void 0 ? void 0 : _f.message), excludeErrorKeys: exports.excludeErrorKeys }),
+                                    message: (0, objectToArray_js_1.default)({
+                                        obj: ((_e = res.data) === null || _e === void 0 ? void 0 : _e[errKey]) || ((_f = res.data) === null || _f === void 0 ? void 0 : _f.message),
+                                        excludeErrorKeys: exports.customExcludeErrorKeys,
+                                    }),
                                     fullRes: res.data,
                                 }];
                         else if ((0, response_api_js_1.allKeysExist)(res.data, ["".concat(dataKey, "||data")]))
@@ -61,7 +67,10 @@ var customApi = function (fun) {
                                     error: false,
                                     status: res.status,
                                     data: ((_g = res.data) === null || _g === void 0 ? void 0 : _g[dataKey]) || ((_h = res.data) === null || _h === void 0 ? void 0 : _h.data),
-                                    message: (0, objectToArray_js_1.default)({ obj: ((_j = res.data) === null || _j === void 0 ? void 0 : _j[dataKey]) || ((_k = res.data) === null || _k === void 0 ? void 0 : _k.data), excludeErrorKeys: exports.excludeErrorKeys }),
+                                    message: (0, objectToArray_js_1.default)({
+                                        obj: ((_j = res.data) === null || _j === void 0 ? void 0 : _j[dataKey]) || ((_k = res.data) === null || _k === void 0 ? void 0 : _k.data),
+                                        excludeErrorKeys: exports.customExcludeErrorKeys,
+                                    }),
                                     fullRes: res.data,
                                 }];
                         else
@@ -69,7 +78,7 @@ var customApi = function (fun) {
                                     error: false,
                                     status: res.status,
                                     data: res.data,
-                                    message: (0, objectToArray_js_1.default)({ obj: res.data, excludeErrorKeys: exports.excludeErrorKeys }),
+                                    message: (0, objectToArray_js_1.default)({ obj: res.data, excludeErrorKeys: exports.customExcludeErrorKeys }),
                                     fullRes: res.data,
                                 }];
                         return [3 /*break*/, 6];
@@ -90,18 +99,21 @@ var customApi = function (fun) {
                                 status: (_p = err_1.response) === null || _p === void 0 ? void 0 : _p.status,
                                 message: (0, objectToArray_js_1.default)({
                                     obj: ((_r = (_q = err_1.response) === null || _q === void 0 ? void 0 : _q.data) === null || _r === void 0 ? void 0 : _r[errKey]) || ((_t = (_s = err_1.response) === null || _s === void 0 ? void 0 : _s.data) === null || _t === void 0 ? void 0 : _t.message),
-                                    excludeErrorKeys: exports.excludeErrorKeys,
+                                    excludeErrorKeys: exports.customExcludeErrorKeys,
                                 }),
                             };
                         else if ((0, response_api_js_1.allKeysExist)((_u = err_1.response) === null || _u === void 0 ? void 0 : _u.data, ["".concat(dataKey, "||data")]))
                             data = {
                                 status: (_v = err_1.response) === null || _v === void 0 ? void 0 : _v.status,
-                                message: (0, objectToArray_js_1.default)({ obj: ((_x = (_w = err_1.response) === null || _w === void 0 ? void 0 : _w.data) === null || _x === void 0 ? void 0 : _x[dataKey]) || ((_z = (_y = err_1.response) === null || _y === void 0 ? void 0 : _y.data) === null || _z === void 0 ? void 0 : _z.data), excludeErrorKeys: exports.excludeErrorKeys }),
+                                message: (0, objectToArray_js_1.default)({
+                                    obj: ((_x = (_w = err_1.response) === null || _w === void 0 ? void 0 : _w.data) === null || _x === void 0 ? void 0 : _x[dataKey]) || ((_z = (_y = err_1.response) === null || _y === void 0 ? void 0 : _y.data) === null || _z === void 0 ? void 0 : _z.data),
+                                    excludeErrorKeys: exports.customExcludeErrorKeys,
+                                }),
                             };
                         else
                             data = {
                                 status: (_0 = err_1.response) === null || _0 === void 0 ? void 0 : _0.status,
-                                message: (0, objectToArray_js_1.default)({ obj: (_1 = err_1.response) === null || _1 === void 0 ? void 0 : _1.data, excludeErrorKeys: exports.excludeErrorKeys }),
+                                message: (0, objectToArray_js_1.default)({ obj: (_1 = err_1.response) === null || _1 === void 0 ? void 0 : _1.data, excludeErrorKeys: exports.customExcludeErrorKeys }),
                             };
                         return [2 /*return*/, tslib_1.__assign(tslib_1.__assign({ error: true }, data), { data: null, fullRes: (_2 = err_1.response) === null || _2 === void 0 ? void 0 : _2.data })];
                     case 6: return [2 /*return*/];
