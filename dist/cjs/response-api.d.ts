@@ -1,9 +1,11 @@
 export declare let cancelRequest: any;
-export declare const Axios: import("axios").AxiosStatic;
-export declare const apiResStructure: {
+type apiResStructureType = {
     errKey: string;
     dataKey: string;
 };
+export declare const Axios: import("axios").AxiosStatic;
+export declare let apiResStructure: apiResStructureType | null;
+export declare const setExcludeErrorKeys: (keys: string[]) => void;
 export declare const allKeysExist: (obj: any, keys?: any) => any;
 declare const ResponseApi: (url: string, method: string, data: any, headerData?: any) => () => Promise<{
     error: boolean;

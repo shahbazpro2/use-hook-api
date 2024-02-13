@@ -9,10 +9,6 @@ interface ActionTypes {
 export declare const apiCacheAtom: import("jotai").PrimitiveAtom<AtomTypes> & {
     init: AtomTypes;
 };
-export declare const excludeErrorKeysAtom: import("jotai").PrimitiveAtom<string[]> & {
-    init: string[];
-};
-export declare const useSetExcludeErrorKeys: () => (payload: string[]) => void;
 export declare const setApiCacheAtom: import("jotai").WritableAtom<null, [action: ActionTypes], void> & {
     init: null;
 };

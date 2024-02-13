@@ -171,6 +171,7 @@ export const useApi = (
     if (res instanceof Function) {
       res = await res()
     }
+    if (res?.error && !res?.status) return
 
     if (res) {
       if (res.error) {

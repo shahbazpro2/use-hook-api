@@ -9,9 +9,9 @@ function objectToArray({ obj = {}, arr = [], tempKey = null, excludeErrorKeys = 
   if (Array.isArray(obj)) {
     for (let i = 0; i < obj.length; i++) {
       if (typeof obj?.[i] === 'object') {
-        objectToArray({ obj: obj[i], arr, tempKey, excludeErrorKeys })
+        if (!excludeErrorKeys.includes(tempKey)) objectToArray({ obj: obj[i], arr, tempKey, excludeErrorKeys })
       } else {
-        arr.push(obj?.[i] || obj)
+        if (!excludeErrorKeys.includes(tempKey)) arr.push(obj?.[i] || obj)
       }
     }
   } else if (typeof obj === 'object') {
@@ -20,7 +20,7 @@ function objectToArray({ obj = {}, arr = [], tempKey = null, excludeErrorKeys = 
         tempKey = key
       }
       if (typeof obj[key] === 'object') {
-        objectToArray({ obj: obj[key], arr, tempKey, excludeErrorKeys })
+        if (!excludeErrorKeys.includes(key)) objectToArray({ obj: obj[key], arr, tempKey, excludeErrorKeys })
       } else {
         if (
           key === 'icabbi_error' ||
@@ -33,7 +33,7 @@ function objectToArray({ obj = {}, arr = [], tempKey = null, excludeErrorKeys = 
       }
     }
   } else {
-    arr.push(obj)
+    if (!excludeErrorKeys.includes(tempKey)) arr.push(obj)
   }
 
   return arr
