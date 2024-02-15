@@ -6,10 +6,12 @@ function objectToArray(_a) {
     if (Array.isArray(obj)) {
         for (var i = 0; i < obj.length; i++) {
             if (typeof (obj === null || obj === void 0 ? void 0 : obj[i]) === 'object') {
-                objectToArray({ obj: obj[i], arr: arr, tempKey: tempKey, excludeErrorKeys: excludeErrorKeys });
+                if (!excludeErrorKeys.includes(tempKey))
+                    objectToArray({ obj: obj[i], arr: arr, tempKey: tempKey, excludeErrorKeys: excludeErrorKeys });
             }
             else {
-                arr.push((obj === null || obj === void 0 ? void 0 : obj[i]) || obj);
+                if (!excludeErrorKeys.includes(tempKey))
+                    arr.push((obj === null || obj === void 0 ? void 0 : obj[i]) || obj);
             }
         }
     }
@@ -19,7 +21,8 @@ function objectToArray(_a) {
                 tempKey = key;
             }
             if (typeof obj[key] === 'object') {
-                objectToArray({ obj: obj[key], arr: arr, tempKey: tempKey, excludeErrorKeys: excludeErrorKeys });
+                if (!excludeErrorKeys.includes(key))
+                    objectToArray({ obj: obj[key], arr: arr, tempKey: tempKey, excludeErrorKeys: excludeErrorKeys });
             }
             else {
                 if (key === 'icabbi_error' ||
@@ -33,7 +36,8 @@ function objectToArray(_a) {
         }
     }
     else {
-        arr.push(obj);
+        if (!excludeErrorKeys.includes(tempKey))
+            arr.push(obj);
     }
     return arr;
 }

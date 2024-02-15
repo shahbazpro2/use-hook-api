@@ -118,6 +118,8 @@ export var useApi = function (_a, fun, topSuccessCallback, topErrCallback) {
                         res = _f.sent();
                         _f.label = 6;
                     case 6:
+                        if ((res === null || res === void 0 ? void 0 : res.error) && !(res === null || res === void 0 ? void 0 : res.status))
+                            return [2 /*return*/];
                         if (res) {
                             if (res.error) {
                                 stateVal = {
