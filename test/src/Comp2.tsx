@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react'
-import { useApi } from './hook/use-api'
 import { getPocApi } from './api'
+import { useApi } from './hook/use-api'
 
 const Comp2 = () => {
     const [callApi, { data, loading, clearCache }] = useApi({ errMsg: true })
