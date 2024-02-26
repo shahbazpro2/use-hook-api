@@ -27,6 +27,7 @@ interface Config {
 }
 
 export interface StateVal {
+  apiLoading: boolean
   loading: boolean
   error: boolean
   status: number | null
@@ -54,6 +55,7 @@ type ReturnType = [
   (fun: Fun, successCallback?: CallbackState | null, errCallback?: CallbackState | null, config?: Config) => void,
   {
     loading: boolean
+    apiLoading: boolean
     error: boolean
     status: number | null
     message: string
@@ -66,6 +68,7 @@ type ReturnType = [
 ]
 
 const initialState = {
+  apiLoading: false,
   loading: false,
   error: false,
   status: null,

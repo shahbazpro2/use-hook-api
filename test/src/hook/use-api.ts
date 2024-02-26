@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable prettier/prettier */
+import { setApiCacheAtom, useApiCache } from './apiJotai.js'
 import { useSetAtom } from 'jotai'
 import { useEffect, useState } from 'react'
-import { setApiCacheAtom, useApiCache } from './apiJotai'
-import { generateUUid } from './generateUUid'
-import { setFeedbackAtom } from './feedback'
+import { setFeedbackAtom } from './feedback.js'
+import { generateUUid } from './generateUUid.js'
 
 const key = generateUUid()
 const cacheFunctions = new Map()
@@ -26,6 +27,7 @@ interface Config {
 }
 
 export interface StateVal {
+  apiLoading: boolean
   loading: boolean
   error: boolean
   status: number | null
@@ -53,6 +55,7 @@ type ReturnType = [
   (fun: Fun, successCallback?: CallbackState | null, errCallback?: CallbackState | null, config?: Config) => void,
   {
     loading: boolean
+    apiLoading: boolean
     error: boolean
     status: number | null
     message: string
@@ -65,6 +68,7 @@ type ReturnType = [
 ]
 
 const initialState = {
+  apiLoading: false,
   loading: false,
   error: false,
   status: null,
@@ -83,9 +87,6 @@ export const useApi = (
   const setApiCache = useSetAtom(setApiCacheAtom)
   const cacheData = useApiCache(cache)
   const [state, setState] = useState<State>({})
-
-  console.log('state', state)
-  console.log('cacheData', cacheData)
 
   useEffect(() => {
     if (fun) {
@@ -114,7 +115,7 @@ export const useApi = (
     if (cache || key) {
       setApiCache({
         key: cache || key,
-        value: initialState,
+        value: null,
       })
       cacheFunctions.delete(cache || key)
       setState((prevState: State) => ({ ...prevState, [cache || key]: { ...initialState } }))
@@ -146,11 +147,12 @@ export const useApi = (
     cacheFunctions.set(cache || key, { fun, successCallback, errCallback, config })
     let stateVal = {
       ...state[cache || key],
+      apiLoading: config?.loading ?? true,
       loading: config?.loading ?? true,
     }
 
     if (cacheData?.loading === false) {
-      stateVal = { ...cacheData, loading: config?.loading ?? false }
+      stateVal = { ...cacheData, loading: config?.loading ?? false, apiLoading: config?.loading ?? true }
     }
 
     if (config?.loading !== false) {
@@ -176,6 +178,7 @@ export const useApi = (
     if (res) {
       if (res.error) {
         stateVal = {
+          apiLoading: false,
           loading: false,
           error: res.error,
           status: res.status,
@@ -206,6 +209,7 @@ export const useApi = (
         if (topErrCallback) topErrCallback(stateVal)
       } else {
         stateVal = {
+          apiLoading: false,
           loading: false,
           error: res.error,
           status: res.status,

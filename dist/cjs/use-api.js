@@ -12,6 +12,7 @@ var generateUUid_js_1 = require("./generateUUid.js");
 var key = (0, generateUUid_js_1.generateUUid)();
 var cacheFunctions = new Map();
 var initialState = {
+    apiLoading: false,
     loading: false,
     error: false,
     status: null,
@@ -121,8 +122,6 @@ var useApi = function (_a, fun, topSuccessCallback, topErrCallback) {
                         res = _f.sent();
                         _f.label = 6;
                     case 6:
-                        if ((res === null || res === void 0 ? void 0 : res.error) && !(res === null || res === void 0 ? void 0 : res.status))
-                            return [2 /*return*/];
                         if (res) {
                             if (res.error) {
                                 stateVal = {

@@ -3,7 +3,7 @@ import { useApi } from './hook/use-api'
 import { getPocApi } from './api'
 
 const Comp1 = () => {
-    const [callApi, { data, loading, clearCache }] = useApi({ errMsg: true })
+    const [callApi, { data, loading, apiLoading, clearCache }] = useApi({ errMsg: true })
 
 
     console.log('comp1', data, loading)
