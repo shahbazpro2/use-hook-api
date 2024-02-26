@@ -1,3 +1,4 @@
+/* eslint-disable no-throw-literal */
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable no-undef */
 

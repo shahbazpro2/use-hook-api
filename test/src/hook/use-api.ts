@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable prettier/prettier */
 import { setApiCacheAtom, useApiCache } from './apiJotai.js'
 import { useSetAtom } from 'jotai'
 import { useEffect, useState } from 'react'
