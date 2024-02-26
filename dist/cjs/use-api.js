@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.useApi = void 0;
 var tslib_1 = require("tslib");
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable prettier/prettier */
 var apiJotai_js_1 = require("./apiJotai.js");
 var jotai_1 = require("jotai");
 var react_1 = require("react");
