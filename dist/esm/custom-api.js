@@ -4,11 +4,17 @@
 import { __assign, __awaiter, __generator } from "tslib";
 import objectToArray from './objectToArray.js';
 import { allKeysExist } from './response-api.js';
-export var customApiResStructure = {
+var customApiResStructure = {
     errKey: 'message',
     dataKey: 'data',
 };
-export var customExcludeErrorKeys = [];
+var customExcludeErrorKeys = [];
+export var setCustomExcludeErrorKeys = function (keys) {
+    customExcludeErrorKeys = keys;
+};
+export var setCustomApiResStructure = function (structure) {
+    customApiResStructure = structure;
+};
 var isFunc = function (fun) { return fun instanceof Function; };
 var customApi = function (fun) {
     var errKey = customApiResStructure.errKey, dataKey = customApiResStructure.dataKey;

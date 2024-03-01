@@ -6,7 +6,7 @@ import objectToArray from './objectToArray.js';
 var CancelToken = axios.CancelToken;
 export var cancelRequest = null;
 export var Axios = axios;
-export var apiResStructure = null;
+var apiResStructure = null;
 var initialApiResStructure = {
     errKey: 'message',
     dataKey: 'data',
@@ -17,6 +17,9 @@ if (!apiResStructure) {
 var excludeErrorKeys = [];
 export var setExcludeErrorKeys = function (keys) {
     excludeErrorKeys = keys;
+};
+export var setApiResStructure = function (structure) {
+    apiResStructure = structure;
 };
 export var allKeysExist = function (obj, keys) {
     if (keys === void 0) { keys = []; }
