@@ -5,12 +5,25 @@
 import objectToArray from './objectToArray.js'
 import { allKeysExist } from './response-api.js'
 
-export const customApiResStructure = {
+type apiResStructureType = {
+  errKey: string
+  dataKey: string
+}
+
+let customApiResStructure: apiResStructureType = {
   errKey: 'message',
   dataKey: 'data',
 }
 
-export const customExcludeErrorKeys: string[] = []
+let customExcludeErrorKeys: string[] = []
+
+export const setCustomExcludeErrorKeys = (keys: string[]) => {
+  customExcludeErrorKeys = keys
+}
+
+export const setCustomApiResStructure = (structure: apiResStructureType) => {
+  customApiResStructure = structure
+}
 
 const isFunc = (fun: any) => fun instanceof Function
 const customApi = (fun: any) => {

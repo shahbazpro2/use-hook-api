@@ -11,7 +11,7 @@ type apiResStructureType = {
 }
 
 export const Axios = axios
-export let apiResStructure: apiResStructureType | null = null
+let apiResStructure: apiResStructureType | null = null
 const initialApiResStructure = {
   errKey: 'message',
   dataKey: 'data',
@@ -25,6 +25,10 @@ let excludeErrorKeys: string[] = []
 
 export const setExcludeErrorKeys = (keys: string[]) => {
   excludeErrorKeys = keys
+}
+
+export const setApiResStructure = (structure: apiResStructureType) => {
+  apiResStructure = structure
 }
 
 export const allKeysExist = (obj: any, keys: any = []) => {
