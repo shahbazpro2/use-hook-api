@@ -7,7 +7,7 @@ interface FeedbackType {
   type: string
 }
 
-type SetFeedbackType = [string[] | null, string]
+type SetFeedbackType = [string[] | string | null, string]
 
 export const feedbackAtom = atom<FeedbackType>({
   message: null,
@@ -28,7 +28,7 @@ export const useSetFeedback = () => {
   return useMemo(() => {
     return (payload: SetFeedbackType) =>
       setFeedback({
-        message: payload?.[0],
+        message: payload?.[0] ? (Array.isArray(payload?.[0]) ? payload?.[0] : [payload?.[0]]) : null,
         type: payload?.[1] || 'error',
       })
   }, [])

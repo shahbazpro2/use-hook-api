@@ -2,7 +2,7 @@
 /* eslint-disable no-undef */
 
 import axios from 'axios'
-import objectToArray from './objectToArray.js'
+import objectToArray from './objectToArray'
 const CancelToken = axios.CancelToken
 export let cancelRequest: any = null
 type apiResStructureType = {
@@ -41,7 +41,7 @@ export const allKeysExist = (obj: any, keys: any = []) => {
   })
 }
 
-const ResponseApi = (url: string, method: string, data: any, headerData: any = {}) => {
+const ResponseApi = (url: string, method: string, data?: any, headerData: any = {}) => {
   const { errKey, dataKey }: apiResStructureType = apiResStructure || initialApiResStructure
   return async function apiFun() {
     try {
