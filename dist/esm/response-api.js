@@ -2,7 +2,7 @@
 /* eslint-disable no-undef */
 import { __assign, __awaiter, __generator } from "tslib";
 import axios from 'axios';
-import objectToArray from './objectToArray.js';
+import objectToArray from './objectToArray';
 var CancelToken = axios.CancelToken;
 export var cancelRequest = null;
 export var Axios = axios;

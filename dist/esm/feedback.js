@@ -14,10 +14,10 @@ export var clearFeedbackAtom = atom(null, function (_get, set) {
 export var useSetFeedback = function () {
     var setFeedback = useSetAtom(setFeedbackAtom);
     return useMemo(function () {
-        return function (payload) {
+        return function (message, type) {
             return setFeedback({
-                message: payload === null || payload === void 0 ? void 0 : payload[0],
-                type: (payload === null || payload === void 0 ? void 0 : payload[1]) || 'error',
+                message: message ? (Array.isArray(message) ? message : [message]) : null,
+                type: type || 'error',
             });
         };
     }, []);

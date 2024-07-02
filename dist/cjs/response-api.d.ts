@@ -7,7 +7,7 @@ export declare const Axios: import("axios").AxiosStatic;
 export declare const setExcludeErrorKeys: (keys: string[]) => void;
 export declare const setApiResStructure: (structure: apiResStructureType) => void;
 export declare const allKeysExist: (obj: any, keys?: any) => any;
-declare const ResponseApi: (url: string, method: string, data: any, headerData?: any) => () => Promise<{
+declare const ResponseApi: (url: string, method: string, data?: any, headerData?: any) => () => Promise<{
     error: boolean;
     status: number;
     data: any;

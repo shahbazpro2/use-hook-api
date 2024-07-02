@@ -17,10 +17,10 @@ exports.clearFeedbackAtom = (0, jotai_1.atom)(null, function (_get, set) {
 var useSetFeedback = function () {
     var setFeedback = (0, jotai_1.useSetAtom)(exports.setFeedbackAtom);
     return (0, react_1.useMemo)(function () {
-        return function (payload) {
+        return function (message, type) {
             return setFeedback({
-                message: payload === null || payload === void 0 ? void 0 : payload[0],
-                type: (payload === null || payload === void 0 ? void 0 : payload[1]) || 'error',
+                message: message ? (Array.isArray(message) ? message : [message]) : null,
+                type: type || 'error',
             });
         };
     }, []);
