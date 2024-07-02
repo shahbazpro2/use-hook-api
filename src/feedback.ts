@@ -3,11 +3,9 @@ import { atom, useAtomValue, useSetAtom } from 'jotai'
 import { useMemo } from 'react'
 
 interface FeedbackType {
-  message: string[] | null
+  message: string | string[] | null
   type: string
 }
-
-type SetFeedbackType = [string[] | null, string]
 
 export const feedbackAtom = atom<FeedbackType>({
   message: null,
@@ -26,10 +24,10 @@ export const useSetFeedback = () => {
   const setFeedback = useSetAtom(setFeedbackAtom)
 
   return useMemo(() => {
-    return (payload: SetFeedbackType) =>
+    return (message: string | string[], type: string) =>
       setFeedback({
-        message: payload?.[0],
-        type: payload?.[1] || 'error',
+        message: message,
+        type: type || 'error',
       })
   }, [])
 }

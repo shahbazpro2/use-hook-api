@@ -2,26 +2,30 @@
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable no-undef */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.allKeysExist = exports.setExcludeErrorKeys = exports.apiResStructure = exports.Axios = exports.cancelRequest = void 0;
+exports.allKeysExist = exports.setApiResStructure = exports.setExcludeErrorKeys = exports.Axios = exports.cancelRequest = void 0;
 var tslib_1 = require("tslib");
 var axios_1 = tslib_1.__importDefault(require("axios"));
 var objectToArray_js_1 = tslib_1.__importDefault(require("./objectToArray.js"));
 var CancelToken = axios_1.default.CancelToken;
 exports.cancelRequest = null;
 exports.Axios = axios_1.default;
-exports.apiResStructure = null;
+var apiResStructure = null;
 var initialApiResStructure = {
     errKey: 'message',
     dataKey: 'data',
 };
-if (!exports.apiResStructure) {
-    exports.apiResStructure = initialApiResStructure;
+if (!apiResStructure) {
+    apiResStructure = initialApiResStructure;
 }
 var excludeErrorKeys = [];
 var setExcludeErrorKeys = function (keys) {
     excludeErrorKeys = keys;
 };
 exports.setExcludeErrorKeys = setExcludeErrorKeys;
+var setApiResStructure = function (structure) {
+    apiResStructure = structure;
+};
+exports.setApiResStructure = setApiResStructure;
 var allKeysExist = function (obj, keys) {
     if (keys === void 0) { keys = []; }
     return keys.every(function (key) {
@@ -35,7 +39,7 @@ var allKeysExist = function (obj, keys) {
 exports.allKeysExist = allKeysExist;
 var ResponseApi = function (url, method, data, headerData) {
     if (headerData === void 0) { headerData = {}; }
-    var _a = exports.apiResStructure || initialApiResStructure, errKey = _a.errKey, dataKey = _a.dataKey;
+    var _a = apiResStructure || initialApiResStructure, errKey = _a.errKey, dataKey = _a.dataKey;
     return function apiFun() {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2;
         return tslib_1.__awaiter(this, void 0, void 0, function () {
