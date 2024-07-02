@@ -26,7 +26,7 @@ export const useSetFeedback = () => {
   return useMemo(() => {
     return (message: string | string[], type: string) =>
       setFeedback({
-        message: message,
+        message: message ? (Array.isArray(message) ? message : [message]) : null,
         type: type || 'error',
       })
   }, [])
