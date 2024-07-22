@@ -131,6 +131,7 @@ export const useApi = (
   }
 
   const setCacheData = (payload: any) => {
+    console.log('apipayload', payload, cache, cacheData)
     if (!payload) return
     if (cache) {
       const tempData = { ...cacheData }
