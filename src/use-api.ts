@@ -141,7 +141,10 @@ export const useApi = (
         },
       })
     } else {
-      setState((prevState: State) => ({ ...prevState, [cache || key]: { ...prevState[cache || key], ...data } }))
+      setState((prevState: State) => ({
+        ...prevState,
+        [cache || key]: { ...prevState[cache || key], data, customData: data },
+      }))
     }
   }
 
