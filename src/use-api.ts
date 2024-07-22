@@ -133,6 +133,7 @@ export const useApi = (
   const setCacheData = (payload: any) => {
     if (cache) {
       const tempData = cacheData
+      if (!tempData) return
       tempData.data = payload
       tempData.customData = payload
 
@@ -142,6 +143,7 @@ export const useApi = (
       })
     } else if (cache || key) {
       const tempData = state[cache || key]
+      if (!tempData) return
       tempData.data = payload
       tempData.customData = payload
 
