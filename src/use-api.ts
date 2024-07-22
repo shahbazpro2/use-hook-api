@@ -32,6 +32,7 @@ export interface StateVal {
   status: number | null
   message: string
   data: any
+  customData?: any
   fullRes?: any
 }
 //state has key and value
@@ -60,6 +61,7 @@ type ReturnType = [
     message: string
     data: any
     fullRes?: any
+    customData?: any
     clearCache: () => void
     refetch: () => void
     setCacheData: (data: any) => void
@@ -135,6 +137,7 @@ export const useApi = (
         value: {
           ...cacheData,
           data,
+          customData: data,
         },
       })
     } else {
