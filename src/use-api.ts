@@ -132,18 +132,22 @@ export const useApi = (
 
   const setCacheData = (payload: any) => {
     if (cache) {
+      const tempData = { ...cacheData }
+      tempData.data = payload
+      tempData.customData = payload
+
       setApiCache({
         key: cache,
-        value: {
-          ...cacheData,
-          data: payload,
-          customData: payload,
-        },
+        value: structuredClone(tempData),
       })
     } else {
+      const tempData = { ...state[cache || key] }
+      tempData.data = payload
+      tempData.customData = payload
+
       setState((prevState: State) => ({
         ...prevState,
-        [cache || key]: { ...prevState[cache || key], data: payload, customData: payload },
+        [cache || key]: structuredClone(tempData),
       }))
     }
   }
