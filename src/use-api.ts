@@ -130,20 +130,20 @@ export const useApi = (
     }
   }
 
-  const setCacheData = (data: any) => {
+  const setCacheData = (payload: any) => {
     if (cache) {
       setApiCache({
         key: cache,
         value: {
           ...cacheData,
-          data,
-          customData: data,
+          data: payload,
+          customData: payload,
         },
       })
     } else {
       setState((prevState: State) => ({
         ...prevState,
-        [cache || key]: { ...prevState[cache || key], data, customData: data },
+        [cache || key]: { ...prevState[cache || key], data: payload, customData: payload },
       }))
     }
   }
