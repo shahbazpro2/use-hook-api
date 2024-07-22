@@ -131,8 +131,6 @@ export const useApi = (
   }
 
   const setCacheData = (payload: any) => {
-    console.log('apipayload', payload, cache, cacheData)
-    if (!payload) return
     if (cache) {
       const tempData = { ...cacheData }
       tempData.data = payload
@@ -142,7 +140,7 @@ export const useApi = (
         key: cache,
         value: structuredClone(tempData),
       })
-    } else {
+    } else if (cache || key) {
       const tempData = { ...state[cache || key] }
       tempData.data = payload
       tempData.customData = payload
