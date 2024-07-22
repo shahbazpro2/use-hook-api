@@ -131,6 +131,7 @@ export const useApi = (
   }
 
   const setCacheData = (payload: any) => {
+    if (!payload || payload === undefined) return
     if (cache) {
       setApiCache({
         key: cache,

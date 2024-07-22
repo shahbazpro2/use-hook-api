@@ -21,10 +21,10 @@ export const setApiCacheAtom = atom(null, (get, set, action: ActionTypes) => {
     set(apiCacheAtom, cache)
     return
   }
-  set(apiCacheAtom, {
-    ...cache,
+  set(apiCacheAtom, (prev: any) => ({
+    ...prev,
     [action.key]: action.value,
-  })
+  }))
 })
 
 export const setExistingCacheAtom = atom(null, (get, set, action: ActionTypes) => {
