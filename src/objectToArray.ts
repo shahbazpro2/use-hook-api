@@ -24,7 +24,8 @@ function objectToArray({ obj = {}, arr = [], tempKey = null, excludeErrorKeys = 
       } else {
         if (
           key === 'icabbi_error' ||
-          (typeof obj[key] === 'string' && ['This field is required.', 'This field is required']?.includes(obj[key]))
+          (typeof obj[key] === 'string' &&
+            ['This field is required.', 'This field is required', 'This field']?.includes(obj[key]))
         ) {
           arr.push(`${tempKey}: ${obj[key]}`)
         } else if (key !== 'code' && !excludeErrorKeys.includes(key)) {
