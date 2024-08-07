@@ -5,28 +5,40 @@ type ObjectToArray = {
   excludeErrorKeys: string[]
 }
 
+function isValidNumber(input: any) {
+  if (typeof input === 'number' && !isNaN(input)) {
+    return true
+  }
+
+  if (typeof input === 'string' && /^-?\d+(\.\d+)?$/.test(input.trim())) {
+    return !isNaN(Number(input))
+  }
+
+  return false
+}
+
 function objectToArray({ obj = {}, arr = [], tempKey = null, excludeErrorKeys = [] }: ObjectToArray) {
   if (Array.isArray(obj)) {
     for (let i = 0; i < obj.length; i++) {
       if (typeof obj?.[i] === 'object') {
         if (!excludeErrorKeys.includes(tempKey)) objectToArray({ obj: obj[i], arr, tempKey, excludeErrorKeys })
       } else {
-        if (!excludeErrorKeys.includes(tempKey)) arr.push(obj?.[i] || obj)
+        if (tempKey && typeof obj?.[i] === 'string' && obj?.[i].includes('This field')) {
+          if (!excludeErrorKeys.includes(tempKey)) arr.push(`${tempKey}: ${obj?.[i] || obj}`)
+        } else {
+          if (!excludeErrorKeys.includes(tempKey)) arr.push(obj?.[i] || obj)
+        }
       }
     }
   } else if (typeof obj === 'object') {
     for (const key in obj) {
-      if (!Number.isNaN(Number(key))) {
+      if (!isValidNumber(key)) {
         tempKey = key
       }
       if (typeof obj[key] === 'object') {
         if (!excludeErrorKeys.includes(key)) objectToArray({ obj: obj[key], arr, tempKey, excludeErrorKeys })
       } else {
-        if (
-          key === 'icabbi_error' ||
-          (typeof obj[key] === 'string' &&
-            ['This field is required.', 'This field is required', 'This field']?.includes(obj[key]))
-        ) {
+        if (key === 'icabbi_error' || (typeof obj[key] === 'string' && obj[key].includes('This field'))) {
           arr.push(`${tempKey}: ${obj[key]}`)
         } else if (key !== 'code' && !excludeErrorKeys.includes(key)) {
           arr.push(obj[key])
