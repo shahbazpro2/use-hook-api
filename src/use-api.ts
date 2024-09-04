@@ -119,7 +119,7 @@ export const useApi = (
         value: null,
       })
       cacheFunctions.delete(cache || key)
-      setState((prevState: State) => ({ ...prevState, [cache || key]: { ...initialState } }))
+      setState((prevState: State) => ({ ...prevState, [cache || key]: structuredClone(initialState) }))
     }
   }
 
