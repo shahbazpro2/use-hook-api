@@ -16,9 +16,10 @@ export const apiCacheAtom = atom<AtomTypes>({})
 
 export const setApiCacheAtom = atom(null, (get, set, action: ActionTypes) => {
   const cache = get(apiCacheAtom)
+  const tempCache = structuredClone(cache)
   if (action.value === null) {
-    delete cache[action.key]
-    set(apiCacheAtom, cache)
+    delete tempCache[action.key]
+    set(apiCacheAtom, tempCache)
     return
   }
   set(apiCacheAtom, (prev: any) => ({
@@ -27,15 +28,14 @@ export const setApiCacheAtom = atom(null, (get, set, action: ActionTypes) => {
   }))
 })
 
-export const setExistingCacheAtom = atom(null, (get, set, action: ActionTypes) => {
-  const cache = get(apiCacheAtom)
-  set(apiCacheAtom, {
-    ...cache,
+export const setExistingCacheAtom = atom(null, (_, set, action: ActionTypes) => {
+  set(apiCacheAtom, (prev: any) => ({
+    ...prev,
     [action.key]: {
-      ...cache[action.key],
+      ...prev[action.key],
       ...action.value,
     },
-  })
+  }))
 })
 
 export const getApiCache = (key?: string) => atom((get) => get(apiCacheAtom)[key || ''])
