@@ -14,14 +14,16 @@ interface ActionTypes {
 
 export const apiCacheAtom = atom<AtomTypes>({})
 
-export const setApiCacheAtom = atom(null, (get, set, action: ActionTypes) => {
-  const cache = get(apiCacheAtom)
-  const tempCache = structuredClone(cache)
+export const setApiCacheAtom = atom(null, (_, set, action: ActionTypes) => {
   if (action.value === null) {
-    delete tempCache[action.key]
-    set(apiCacheAtom, tempCache)
+    set(apiCacheAtom, (prev) => {
+      const tempCache = { ...prev }
+      delete tempCache[action.key]
+      return tempCache
+    })
     return
   }
+
   set(apiCacheAtom, (prev: any) => ({
     ...prev,
     [action.key]: action.value,
