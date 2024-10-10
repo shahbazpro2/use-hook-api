@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { setApiCacheAtom, useApiCache } from './apiJotai.js'
 import { useSetAtom } from 'jotai'
-import { useEffect, useState } from 'react'
-import { setFeedbackAtom } from './feedback.js'
-import { generateUUid } from './generateUUid.js'
+import { useEffect, useMemo, useState } from 'react'
+import { setApiCacheAtom, useApiCache } from './apiJotai'
+import { setFeedbackAtom } from './feedback'
+import { generateUUid } from './generateUUid'
 
 const key = generateUUid()
 const cacheFunctions = new Map()
@@ -49,6 +49,7 @@ interface Params {
   successCallback?: CallbackState | null
   errCallback?: CallbackState | null
   config?: Config
+  cacheFunKey?: string
 }
 
 type ReturnType = [
@@ -65,6 +66,8 @@ type ReturnType = [
     clearCache: () => void
     refetch: () => void
     setCacheData: (data: any) => void
+    onRefetchApis: (cacheKeys: string[]) => void
+    onClearCaches: (cacheKeys: string[]) => void
   },
 ]
 
@@ -102,53 +105,83 @@ export const useApi = (
     return () => {}
   }, [])
 
-  const executeApi = async (
-    fun: Fun,
-    successCallback?: CallbackState | null,
-    errCallback?: CallbackState | null,
-    config?: Config,
-  ) => {
-    if (!fun) return
-    processing({ fun, successCallback, errCallback, config })
-  }
+  const executeApi = useMemo(
+    () => (fun: Fun, successCallback?: CallbackState | null, errCallback?: CallbackState | null, config?: Config) => {
+      if (!fun) return
+      processing({ fun, successCallback, errCallback, config })
+    },
+    [],
+  )
 
-  const clearCache = () => {
-    if (cache || key) {
+  const clearFun = (cacheKey: string) => {
+    if (cacheKey) {
       setApiCache({
-        key: cache || key,
+        key: cacheKey,
         value: null,
       })
-      cacheFunctions.delete(cache || key)
-      setState((prevState: State) => ({ ...prevState, [cache || key]: structuredClone(initialState) }))
+      cacheFunctions.delete(cacheKey)
     }
   }
 
-  const refetch = () => {
-    if (cacheFunctions.get(cache || key)) {
-      const { fun, successCallback, errCallback, config }: Params = cacheFunctions.get(cache || key)
-      processing({ fun, successCallback, errCallback, config })
-    }
-  }
+  const clearCache = useMemo(
+    () => () => {
+      clearFun(cache || key)
+    },
+    [],
+  )
 
-  const setCacheData = (payload: any) => {
-    if (!payload || payload === undefined) return
-    if (cache) {
-      setApiCache({
-        key: cache,
-        value: structuredClone({ ...cacheData, data: payload, customData: payload }),
+  const refetch = useMemo(
+    () => () => {
+      if (cacheFunctions.get(cache || key)) {
+        const { fun, successCallback, errCallback, config }: Params = cacheFunctions.get(cache || key)
+        processing({ fun, successCallback, errCallback, config })
+      }
+    },
+    [],
+  )
+
+  const setCacheData = useMemo(
+    () => (payload: any) => {
+      if (!payload || payload === undefined) return
+      if (cache) {
+        setApiCache({
+          key: cache,
+          value: structuredClone({ ...cacheData, data: payload, customData: payload }),
+        })
+      } else if (cache || key) {
+        setState((prevState: State) => ({
+          ...prevState,
+          [cache || key]: structuredClone({ ...state[cache || key], data: payload, customData: payload }),
+        }))
+      }
+    },
+    [],
+  )
+
+  const onRefetchApis = useMemo(() => {
+    return (cacheKeys: string[]) => {
+      cacheKeys?.forEach((cacheKey) => {
+        if (cacheFunctions.get(cacheKey)) {
+          const { fun, successCallback, errCallback, config }: Params = cacheFunctions.get(cacheKey)
+          processing({ fun, successCallback, errCallback, config, cacheFunKey: cacheKey })
+        }
       })
-    } else if (cache || key) {
-      setState((prevState: State) => ({
-        ...prevState,
-        [cache || key]: structuredClone({ ...state[cache || key], data: payload, customData: payload }),
-      }))
     }
-  }
+  }, [])
 
-  const processing = async ({ fun, successCallback, errCallback, config }: Params) => {
-    cacheFunctions.set(cache || key, { fun, successCallback, errCallback, config })
+  const onClearCaches = useMemo(() => {
+    return (cacheKeys: string[]) => {
+      cacheKeys?.forEach((cacheKey) => {
+        clearFun(cacheKey)
+      })
+    }
+  }, [])
+
+  const processing = async ({ fun, successCallback, errCallback, config, cacheFunKey }: Params) => {
+    const cacheKey = cacheFunKey || cache
+    cacheFunctions.set(cacheKey, { fun, successCallback, errCallback, config })
     let stateVal = {
-      ...state[cache || key],
+      ...state[cacheKey || key],
       apiLoading: config?.loading ?? true,
       loading: config?.loading ?? true,
     }
@@ -158,12 +191,12 @@ export const useApi = (
     }
 
     if (config?.loading !== false) {
-      if (cache)
+      if (cacheKey)
         setApiCache({
-          key: cache,
+          key: cacheKey,
           value: stateVal,
         })
-      else setState((prevState: State) => ({ ...prevState, [cache || key]: { ...stateVal } }))
+      else setState((prevState: State) => ({ ...prevState, [key]: { ...stateVal } }))
     }
 
     let res = null
@@ -177,69 +210,68 @@ export const useApi = (
       res = await res()
     }
 
-    if (res) {
-      if (res.error) {
-        stateVal = {
-          apiLoading: false,
-          loading: false,
-          error: res.error,
-          status: res.status,
-          message: resErrMsg || res.message,
-          data: !res.error ? res.data : null,
-          fullRes: res?.fullRes,
-        }
-        if (!fullRes) {
-          delete stateVal.fullRes
-        }
-        if (cache) {
-          setApiCache({
-            key: cache,
-            value: { ...stateVal },
-          })
-        } else {
-          setState((prevState: State) => ({
-            ...prevState,
-            [key]: {
-              ...stateVal,
-            },
-          }))
-        }
-        if ((errMsg || both) && config?.errMsg !== false)
-          setFeedback({ message: resErrMsg || res.message, type: 'error' })
+    if (!res) return
 
-        if (errCallback) errCallback(stateVal)
-        if (topErrCallback) topErrCallback(stateVal)
-      } else {
-        stateVal = {
-          apiLoading: false,
-          loading: false,
-          error: res.error,
-          status: res.status,
-          message: resSuccessMsg || res.message,
-          data: !res.error ? res.data : null,
-          fullRes: res?.fullRes,
-        }
-
-        if (!fullRes) {
-          delete stateVal.fullRes
-        }
-
-        if (cache) {
-          setApiCache({
-            key: cache,
-            value: { ...stateVal },
-          })
-        } else setState((prevState: State) => ({ ...prevState, [key]: { ...stateVal } }))
-        if ((successMsg || both) && config?.successMsg !== false)
-          setFeedback({ message: resSuccessMsg || res.message, type: 'success' })
-
-        if (successCallback) successCallback(stateVal)
-        if (topSuccessCallback) topSuccessCallback(stateVal)
-      }
+    const commonStateVal = {
+      apiLoading: false,
+      loading: false,
+      error: res.error,
+      status: res.status,
+      data: !res.error ? res.data : null,
+      fullRes: res?.fullRes,
     }
+
+    if (res.error) {
+      stateVal = {
+        ...commonStateVal,
+        message: resErrMsg || res.message,
+      }
+      if ((errMsg || both) && config?.errMsg !== false)
+        setFeedback({ message: resErrMsg || res.message, type: 'error' })
+
+      if (errCallback) errCallback(stateVal)
+      if (topErrCallback) topErrCallback(stateVal)
+    } else {
+      stateVal = {
+        ...commonStateVal,
+        message: resSuccessMsg || res.message,
+      }
+      if ((successMsg || both) && config?.successMsg !== false)
+        setFeedback({ message: resSuccessMsg || res.message, type: 'success' })
+
+      if (successCallback) successCallback(stateVal)
+      if (topSuccessCallback) topSuccessCallback(stateVal)
+    }
+
+    if (!fullRes) {
+      delete stateVal.fullRes
+    }
+
+    if (cacheKey) {
+      setApiCache({
+        key: cacheKey,
+        value: { ...stateVal },
+      })
+      return
+    }
+
+    setState((prevState: State) => ({
+      ...prevState,
+      [key]: {
+        ...stateVal,
+      },
+    }))
   }
 
-  if (cache && cacheData) return [executeApi, { ...cacheData, clearCache, refetch, setCacheData }]
-  if (!Object.keys(state).length) return [executeApi, { ...initialState, clearCache, refetch, setCacheData }]
-  return [executeApi, { ...state[key], clearCache, refetch, setCacheData }]
+  const commonReturns = {
+    clearCache,
+    refetch,
+    setCacheData,
+    onRefetchApis,
+    onClearCaches,
+  }
+
+  if (cache && cacheData) return [executeApi, { ...cacheData, ...commonReturns }]
+  if (!Object.keys(state).length) return [executeApi, { ...initialState, ...commonReturns }]
+  return [executeApi, { ...state[key], ...commonReturns }]
 }
