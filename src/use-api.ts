@@ -227,7 +227,7 @@ export const useApi = (
         message: resErrMsg || res.message,
       }
       if ((errMsg || both) && config?.errMsg !== false)
-        setFeedback({ message: resErrMsg || res.message, type: 'error' })
+        !cacheFunKey && setFeedback({ message: resErrMsg || res.message, type: 'error' })
 
       if (errCallback) errCallback(stateVal)
       if (topErrCallback) topErrCallback(stateVal)
@@ -237,7 +237,7 @@ export const useApi = (
         message: resSuccessMsg || res.message,
       }
       if ((successMsg || both) && config?.successMsg !== false)
-        setFeedback({ message: resSuccessMsg || res.message, type: 'success' })
+        !cacheFunKey && setFeedback({ message: resSuccessMsg || res.message, type: 'success' })
 
       if (successCallback) successCallback(stateVal)
       if (topSuccessCallback) topSuccessCallback(stateVal)
