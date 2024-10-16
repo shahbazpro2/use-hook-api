@@ -196,7 +196,7 @@ export const useApi = (
           key: cacheKey,
           value: stateVal,
         })
-      else setState((prevState: State) => ({ ...prevState, [key]: { ...stateVal } }))
+      else setState((prevState: State) => ({ ...prevState, [cacheKey || key]: { ...stateVal } }))
     }
 
     let res = null
