@@ -102,7 +102,7 @@ export const useApi = (
         clearCache()
       }
     }
-    return () => {}
+    return () => { }
   }, [])
 
   const executeApi = useMemo(
@@ -250,16 +250,14 @@ export const useApi = (
     if (cacheKey) {
       setApiCache({
         key: cacheKey,
-        value: { ...stateVal },
+        value: structuredClone(stateVal),
       })
       return
     }
 
     setState((prevState: State) => ({
       ...prevState,
-      [key]: {
-        ...stateVal,
-      },
+      [key]: structuredClone(stateVal),
     }))
   }
 
