@@ -103,7 +103,7 @@ export const useApi = (
         clearCache()
       }
     }
-    return () => { }
+    return () => {}
   }, [])
 
   const executeApi = useMemo(
@@ -111,7 +111,7 @@ export const useApi = (
       if (!fun) return
       processing({ fun, successCallback, errCallback, config })
     },
-    [],
+    [cache, cacheData],
   )
 
   const clearFun = (cacheKey: string) => {
@@ -128,7 +128,7 @@ export const useApi = (
     () => () => {
       clearFun(cache || key)
     },
-    [],
+    [cache, cacheData],
   )
 
   const refetch = useMemo(
@@ -138,7 +138,7 @@ export const useApi = (
         processing({ fun, successCallback, errCallback, config })
       }
     },
-    [],
+    [cache, cacheData],
   )
 
   const setCacheData = useMemo(
@@ -156,7 +156,7 @@ export const useApi = (
         }))
       }
     },
-    [],
+    [cache, cacheData],
   )
 
   const onRefetchApis = useMemo(() => {
@@ -168,7 +168,7 @@ export const useApi = (
         }
       })
     }
-  }, [])
+  }, [cache, cacheData])
 
   const onClearCaches = useMemo(() => {
     return (cacheKeys: string[]) => {
@@ -176,7 +176,7 @@ export const useApi = (
         clearFun(cacheKey)
       })
     }
-  }, [])
+  }, [cache, cacheData])
 
   const onSetCacheData = useMemo(() => {
     return (keysValues: { key: string; data: any }[]) => {
@@ -189,7 +189,7 @@ export const useApi = (
         }
       })
     }
-  }, [])
+  }, [cache, cacheData])
 
   const processing = async ({ fun, successCallback, errCallback, config, cacheFunKey }: Params) => {
     const cacheKey = cacheFunKey || cache
@@ -200,15 +200,14 @@ export const useApi = (
       loading: config?.loading ?? true,
     }
 
-    if (cacheData?.loading === false) {
-      stateVal = { ...cacheData, loading: config?.loading ?? false, apiLoading: config?.loading ?? true }
-    }
-
     if (config?.loading !== false) {
       if (cacheKey)
         setApiCache({
           key: cacheKey,
-          value: stateVal,
+          value: {
+            ...stateVal,
+            loading: config?.loading ?? cacheData?.loading ?? true,
+          },
         })
       else setState((prevState: State) => ({ ...prevState, [key]: { ...stateVal } }))
     }
