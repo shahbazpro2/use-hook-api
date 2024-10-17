@@ -68,6 +68,7 @@ type ReturnType = [
     setCacheData: (data: any) => void
     onRefetchApis: (cacheKeys: string[]) => void
     onClearCaches: (cacheKeys: string[]) => void
+    onSetCacheData: (keysValues: { key: string; data: any }[]) => void
   },
 ]
 
@@ -177,6 +178,19 @@ export const useApi = (
     }
   }, [])
 
+  const onSetCacheData = useMemo(() => {
+    return (keysValues: { key: string; data: any }[]) => {
+      keysValues?.forEach(({ key, data }) => {
+        if (key) {
+          setApiCache({
+            key: key,
+            value: structuredClone({ ...cacheData, data, customData: data }),
+          })
+        }
+      })
+    }
+  }, [])
+
   const processing = async ({ fun, successCallback, errCallback, config, cacheFunKey }: Params) => {
     const cacheKey = cacheFunKey || cache
     cacheFunctions.set(cacheKey, { fun, successCallback, errCallback, config })
@@ -196,7 +210,7 @@ export const useApi = (
           key: cacheKey,
           value: stateVal,
         })
-      else setState((prevState: State) => ({ ...prevState, [cacheKey || key]: { ...stateVal } }))
+      else setState((prevState: State) => ({ ...prevState, [key]: { ...stateVal } }))
     }
 
     let res = null
@@ -267,6 +281,7 @@ export const useApi = (
     setCacheData,
     onRefetchApis,
     onClearCaches,
+    onSetCacheData,
   }
 
   if (cache && cacheData) return [executeApi, { ...cacheData, ...commonReturns }]
