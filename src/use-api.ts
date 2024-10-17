@@ -205,7 +205,8 @@ export const useApi = (
         setApiCache({
           key: cacheKey,
           value: {
-            ...stateVal,
+            ...cacheData,
+            apiLoading: config?.loading ?? true,
             loading: config?.loading ?? cacheData?.loading ?? true,
           },
         })
