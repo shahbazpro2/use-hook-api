@@ -1,11 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useSetAtom } from 'jotai'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { setApiCacheAtom, useApiCache } from './apiJotai'
 import { setFeedbackAtom } from './feedback'
 import { generateUUid } from './generateUUid'
 
-const key = generateUUid()
 const cacheFunctions = new Map()
 
 interface Props {
@@ -19,7 +18,12 @@ interface Props {
   unmount?: boolean
 }
 
+interface State {
+  [key: string]: StateVal
+}
+
 interface Config {
+  apiLoading?: boolean
   loading?: boolean
   successMsg?: boolean
   errMsg?: boolean
@@ -35,10 +39,6 @@ export interface StateVal {
   customData?: any
   fullRes?: any
 }
-//state has key and value
-interface State {
-  [key: string]: StateVal
-}
 
 type CallbackState = (state: StateVal) => void
 type Fun = () =>
@@ -50,6 +50,22 @@ interface Params {
   errCallback?: CallbackState | null
   config?: Config
   cacheFunKey?: string
+  cacheData?: StateVal
+  showFeedback?: boolean
+}
+
+interface Processing {
+  both?: boolean
+  errMsg?: boolean
+  successMsg?: boolean
+  resErrMsg?: string
+  resSuccessMsg?: string
+  fullRes?: boolean
+  topErrCallback?: CallbackState | null
+  topSuccessCallback?: CallbackState | null
+  state: State
+  setState: React.Dispatch<React.SetStateAction<State>>
+  key: string
 }
 
 type ReturnType = [
@@ -82,135 +98,49 @@ const initialState = {
   fullRes: null,
 }
 
-export const useApi = (
-  { both = false, errMsg = true, successMsg = false, resErrMsg, resSuccessMsg, cache, fullRes, unmount }: Props,
-  fun?: Fun,
-  topSuccessCallback?: CallbackState | null,
-  topErrCallback?: CallbackState | null,
-): ReturnType => {
+export const useProcessing = ({
+  resErrMsg,
+  errMsg,
+  resSuccessMsg,
+  successMsg,
+  both,
+  topErrCallback,
+  topSuccessCallback,
+  fullRes,
+  state,
+  setState,
+  key,
+}: Processing) => {
   const setFeedback = useSetAtom(setFeedbackAtom)
   const setApiCache = useSetAtom(setApiCacheAtom)
-  const cacheData = useApiCache(cache)
-  const [state, setState] = useState<State>({})
 
-  useEffect(() => {
-    if (fun) {
-      processing({ fun })
-    }
-
-    if (unmount) {
-      return () => {
-        clearCache()
-      }
-    }
-    return () => {}
-  }, [])
-
-  const executeApi = useMemo(
-    () => (fun: Fun, successCallback?: CallbackState | null, errCallback?: CallbackState | null, config?: Config) => {
-      if (!fun) return
-      processing({ fun, successCallback, errCallback, config })
-    },
-    [cache, cacheData],
-  )
-
-  const clearFun = (cacheKey: string) => {
-    if (cacheKey) {
-      setApiCache({
-        key: cacheKey,
-        value: null,
-      })
-      cacheFunctions.delete(cacheKey)
-    }
-  }
-
-  const clearCache = useMemo(
-    () => () => {
-      clearFun(cache || key)
-    },
-    [cache, cacheData],
-  )
-
-  const refetch = useMemo(
-    () => () => {
-      if (cacheFunctions.get(cache || key)) {
-        const { fun, successCallback, errCallback, config }: Params = cacheFunctions.get(cache || key)
-        processing({ fun, successCallback, errCallback, config })
-      }
-    },
-    [cache, cacheData],
-  )
-
-  const setCacheData = useMemo(
-    () => (payload: any) => {
-      if (!payload || payload === undefined) return
-      if (cache) {
-        setApiCache({
-          key: cache,
-          value: structuredClone({ ...cacheData, data: payload, customData: payload }),
-        })
-      } else if (cache || key) {
-        setState((prevState: State) => ({
-          ...prevState,
-          [cache || key]: structuredClone({ ...state[cache || key], data: payload, customData: payload }),
-        }))
-      }
-    },
-    [cache, cacheData],
-  )
-
-  const onRefetchApis = useMemo(() => {
-    return (cacheKeys: string[]) => {
-      cacheKeys?.forEach((cacheKey) => {
-        if (cacheFunctions.get(cacheKey)) {
-          const { fun, successCallback, errCallback, config }: Params = cacheFunctions.get(cacheKey)
-          processing({ fun, successCallback, errCallback, config, cacheFunKey: cacheKey })
-        }
-      })
-    }
-  }, [cache, cacheData])
-
-  const onClearCaches = useMemo(() => {
-    return (cacheKeys: string[]) => {
-      cacheKeys?.forEach((cacheKey) => {
-        clearFun(cacheKey)
-      })
-    }
-  }, [cache, cacheData])
-
-  const onSetCacheData = useMemo(() => {
-    return (keysValues: { key: string; data: any }[]) => {
-      keysValues?.forEach(({ key, data }) => {
-        if (key) {
-          setApiCache({
-            key: key,
-            value: structuredClone({ ...cacheData, data, customData: data }),
-          })
-        }
-      })
-    }
-  }, [cache, cacheData])
-
-  const processing = async ({ fun, successCallback, errCallback, config, cacheFunKey }: Params) => {
-    const cacheKey = cacheFunKey || cache
-    cacheFunctions.set(cacheKey, { fun, successCallback, errCallback, config })
-    let stateVal = {
-      ...state[cacheKey || key],
-      apiLoading: config?.loading ?? true,
+  const onProcessing = async ({
+    fun,
+    successCallback,
+    errCallback,
+    config,
+    cacheFunKey,
+    cacheData,
+    showFeedback,
+  }: Params) => {
+    const cacheKey = cacheFunKey
+    cacheFunctions.set(cacheKey || key, { fun, successCallback, errCallback, config })
+    let stateVal: StateVal | any = {
+      apiLoading: config?.apiLoading ?? true,
       loading: config?.loading ?? true,
     }
 
-    if (config?.loading !== false) {
+    if (config?.loading !== false || config?.apiLoading !== false) {
       if (cacheKey)
         setApiCache({
           key: cacheKey,
           value: {
             ...cacheData,
-            apiLoading: config?.loading ?? true,
-            loading: config?.loading ?? cacheData?.loading ?? true,
+            ...stateVal,
+            loading: config?.loading ?? false,
           },
         })
-      else setState((prevState: State) => ({ ...prevState, [key]: { ...stateVal } }))
+      else setState((prevState: State) => ({ ...prevState, [key]: { ...prevState[key], ...stateVal } }))
     }
 
     let res = null
@@ -241,7 +171,7 @@ export const useApi = (
         message: resErrMsg || res.message,
       }
       if ((errMsg || both) && config?.errMsg !== false)
-        !cacheFunKey && setFeedback({ message: resErrMsg || res.message, type: 'error' })
+        showFeedback && setFeedback({ message: resErrMsg || res.message, type: 'error' })
 
       if (errCallback) errCallback(stateVal)
       if (topErrCallback) topErrCallback(stateVal)
@@ -251,7 +181,7 @@ export const useApi = (
         message: resSuccessMsg || res.message,
       }
       if ((successMsg || both) && config?.successMsg !== false)
-        !cacheFunKey && setFeedback({ message: resSuccessMsg || res.message, type: 'success' })
+        showFeedback && setFeedback({ message: resSuccessMsg || res.message, type: 'success' })
 
       if (successCallback) successCallback(stateVal)
       if (topSuccessCallback) topSuccessCallback(stateVal)
@@ -275,6 +205,140 @@ export const useApi = (
     }))
   }
 
+  return {
+    onProcessing,
+    state,
+  }
+}
+
+export const useApi = (
+  { both = false, errMsg = true, successMsg = false, resErrMsg, resSuccessMsg, cache, fullRes, unmount }: Props,
+  fun?: Fun,
+  topSuccessCallback?: CallbackState | null,
+  topErrCallback?: CallbackState | null,
+): ReturnType => {
+  const stateKey = useMemo(generateUUid, [])
+  const setApiCache = useSetAtom(setApiCacheAtom)
+  const cacheData = useApiCache(cache)
+  const [state, setState] = useState<State>({})
+  const { onProcessing } = useProcessing({
+    both,
+    errMsg,
+    successMsg,
+    resErrMsg,
+    resSuccessMsg,
+    fullRes,
+    topErrCallback,
+    topSuccessCallback,
+    state,
+    setState,
+    key: stateKey,
+  })
+
+  useEffect(() => {
+    if (fun) {
+      onProcessing({ fun, showFeedback: true, cacheData, cacheFunKey: cache })
+    }
+
+    if (unmount) {
+      return () => {
+        clearCache()
+      }
+    }
+    return () => {}
+  }, [])
+
+  const executeApi = useCallback(
+    (fun: Fun, successCallback?: CallbackState | null, errCallback?: CallbackState | null, config?: Config) => {
+      if (!fun) return
+      onProcessing({ fun, successCallback, errCallback, config, showFeedback: true, cacheData, cacheFunKey: cache })
+    },
+    [cacheData, cache],
+  )
+
+  const clearFun = (cacheKey?: string) => {
+    if (cacheKey) {
+      setApiCache({
+        key: cacheKey,
+        value: null,
+      })
+      cacheFunctions.delete(cacheKey)
+    } else {
+      setState((prevState: State) => {
+        const newState = { ...prevState }
+        delete newState[stateKey]
+        return newState
+      })
+    }
+  }
+
+  const clearCache = useCallback(() => {
+    clearFun(cache)
+  }, [cache, stateKey])
+
+  const refetch = useCallback(() => {
+    if (cacheFunctions.get(cache || stateKey)) {
+      const { fun, successCallback, errCallback, config }: Params = cacheFunctions.get(cache || stateKey)
+      onProcessing({ fun, successCallback, errCallback, config, showFeedback: true, cacheData, cacheFunKey: cache })
+    }
+  }, [cache, cacheData, stateKey])
+
+  const setCacheData = useCallback(
+    (payload: any) => {
+      if (!payload || payload === undefined) return
+      if (cache) {
+        setApiCache({
+          key: cache,
+          value: structuredClone({ ...cacheData, data: payload, customData: payload }),
+        })
+      } else {
+        setState((prevState: State) => ({
+          ...prevState,
+          [stateKey]: structuredClone({ ...state[stateKey], data: payload, customData: payload }),
+        }))
+      }
+    },
+    [cache, cacheData],
+  )
+
+  const onRefetchApis = useCallback((cacheKeys: string[]) => {
+    cacheKeys?.forEach((cacheKey) => {
+      if (cacheFunctions.get(cacheKey)) {
+        const { fun, successCallback, errCallback, config }: Params = cacheFunctions.get(cacheKey)
+        onProcessing({
+          fun,
+          successCallback,
+          errCallback,
+          config: {
+            ...config,
+            loading: false,
+          },
+          cacheFunKey: cacheKey,
+        })
+      }
+    })
+  }, [])
+
+  const onClearCaches = useCallback((cacheKeys: string[]) => {
+    cacheKeys?.forEach((cacheKey) => {
+      clearFun(cacheKey)
+    })
+  }, [])
+
+  const onSetCacheData = useCallback(
+    (keysValues: { key: string; data: any }[]) => {
+      keysValues?.forEach(({ key, data }) => {
+        if (key) {
+          setApiCache({
+            key: key,
+            value: structuredClone({ ...cacheData, data, customData: data }),
+          })
+        }
+      })
+    },
+    [cacheData],
+  )
+
   const commonReturns = {
     clearCache,
     refetch,
@@ -286,5 +350,5 @@ export const useApi = (
 
   if (cache && cacheData) return [executeApi, { ...cacheData, ...commonReturns }]
   if (!Object.keys(state).length) return [executeApi, { ...initialState, ...commonReturns }]
-  return [executeApi, { ...state[key], ...commonReturns }]
+  return [executeApi, { ...state[stateKey], ...commonReturns }]
 }
