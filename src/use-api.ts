@@ -137,7 +137,7 @@ export const useProcessing = ({
           value: {
             ...cacheData,
             ...stateVal,
-            loading: config?.loading ?? false,
+            loading: config?.loading ?? cacheData?.loading ?? true,
           },
         })
       else setState((prevState: State) => ({ ...prevState, [key]: { ...prevState[key], ...stateVal } }))
