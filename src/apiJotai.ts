@@ -26,7 +26,10 @@ export const setApiCacheAtom = atom(null, (_, set, action: ActionTypes) => {
 
   set(apiCacheAtom, (prev: any) => ({
     ...prev,
-    [action.key]: action.value,
+    [action.key]: {
+      ...prev?.[action.key],
+      ...action.value,
+    },
   }))
 })
 
