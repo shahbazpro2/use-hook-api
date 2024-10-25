@@ -40,7 +40,7 @@ export interface StateVal {
   fullRes?: any
 }
 
-type CallbackState = (state: StateVal) => void
+type CallbackState = (state: StateVal | null) => void
 type Fun = () =>
   | Promise<{ error: boolean; data: null; status: string | number; message: string[] }>
   | { error: boolean; data: null; status: string | number; message: string[] }
@@ -69,7 +69,12 @@ interface Processing {
 }
 
 type ReturnType = [
-  (fun: Fun, successCallback?: CallbackState | null, errCallback?: CallbackState | null, config?: Config) => void,
+  (
+    fun: Fun,
+    successCallback?: CallbackState | null,
+    errCallback?: CallbackState | null,
+    config?: Config,
+  ) => Promise<StateVal | null>,
   {
     loading: boolean
     apiLoading: boolean
@@ -80,9 +85,9 @@ type ReturnType = [
     fullRes?: any
     customData?: any
     clearCache: () => void
-    refetch: () => void
+    refetch: () => Promise<StateVal | null>
     setCacheData: (data: any) => void
-    onRefetchApis: (cacheKeys: string[]) => void
+    onRefetchApis: (cacheKeys: string[]) => Promise<StateVal[] | null>
     onClearCaches: (cacheKeys: string[]) => void
     onSetCacheData: (keysValues: { key: string; data: any }[]) => void
   },
@@ -154,7 +159,7 @@ export const useProcessing = ({
       res = await res()
     }
 
-    if (!res) return
+    if (!res) return stateVal
 
     const commonStateVal = {
       apiLoading: false,
@@ -196,13 +201,15 @@ export const useProcessing = ({
         key: cacheKey,
         value: structuredClone(stateVal),
       })
-      return
+      return stateVal
     }
 
     setState((prevState: State) => ({
       ...prevState,
       [key]: structuredClone(stateVal),
     }))
+
+    return stateVal
   }
 
   return {
@@ -250,8 +257,16 @@ export const useApi = (
 
   const executeApi = useCallback(
     (fun: Fun, successCallback?: CallbackState | null, errCallback?: CallbackState | null, config?: Config) => {
-      if (!fun) return
-      onProcessing({ fun, successCallback, errCallback, config, showFeedback: true, cacheData, cacheFunKey: cache })
+      if (!fun) return Promise.resolve(null)
+      return onProcessing({
+        fun,
+        successCallback,
+        errCallback,
+        config,
+        showFeedback: true,
+        cacheData,
+        cacheFunKey: cache,
+      })
     },
     [cacheData, cache],
   )
@@ -279,8 +294,17 @@ export const useApi = (
   const refetch = useCallback(() => {
     if (cacheFunctions.get(cache || stateKey)) {
       const { fun, successCallback, errCallback, config }: Params = cacheFunctions.get(cache || stateKey)
-      onProcessing({ fun, successCallback, errCallback, config, showFeedback: true, cacheData, cacheFunKey: cache })
+      return onProcessing({
+        fun,
+        successCallback,
+        errCallback,
+        config,
+        showFeedback: true,
+        cacheData,
+        cacheFunKey: cache,
+      })
     }
+    return Promise.resolve(null)
   }, [cache, cacheData, stateKey])
 
   const setCacheData = useCallback(
@@ -301,22 +325,36 @@ export const useApi = (
     [cache, cacheData],
   )
 
-  const onRefetchApis = useCallback((cacheKeys: string[]) => {
-    cacheKeys?.forEach((cacheKey) => {
+  const onRefetchApis = useCallback(async (cacheKeys: string[]) => {
+    if (!Array.isArray(cacheKeys)) return Promise.resolve(null)
+    const promises = cacheKeys?.map((cacheKey) => {
       if (cacheFunctions.get(cacheKey)) {
         const { fun, successCallback, errCallback, config }: Params = cacheFunctions.get(cacheKey)
-        onProcessing({
-          fun,
-          successCallback,
-          errCallback,
-          config: {
-            ...config,
-            loading: false,
-          },
-          cacheFunKey: cacheKey,
+
+        return new Promise((resolve, reject) => {
+          onProcessing({
+            fun,
+            successCallback: (response: StateVal | null) => {
+              successCallback?.(response)
+              resolve(response)
+            },
+            errCallback: (error: StateVal | null) => {
+              errCallback?.(error)
+              reject(error)
+            },
+            config: {
+              ...config,
+              loading: false,
+            },
+            cacheFunKey: cacheKey,
+          })
         })
       }
+      return Promise.resolve(null)
     })
+    return Promise.all(promises).then((results) => results.filter((result) => result !== null)) as unknown as
+      | StateVal[]
+      | null
   }, [])
 
   const onClearCaches = useCallback((cacheKeys: string[]) => {
