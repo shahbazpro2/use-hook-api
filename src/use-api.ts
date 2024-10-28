@@ -16,6 +16,7 @@ interface Props {
   cache?: string
   fullRes?: boolean
   unmount?: boolean
+  refetchApis?: string[]
 }
 
 interface State {
@@ -52,6 +53,7 @@ interface Params {
   cacheFunKey?: string
   cacheData?: StateVal
   showFeedback?: boolean
+  onRefetchApis?: () => Promise<StateVal[] | null>
 }
 
 interface Processing {
@@ -127,6 +129,7 @@ export const useProcessing = ({
     cacheFunKey,
     cacheData,
     showFeedback,
+    onRefetchApis,
   }: Params) => {
     const cacheKey = cacheFunKey
     cacheFunctions.set(cacheKey || key, { fun, successCallback, errCallback, config })
@@ -190,6 +193,9 @@ export const useProcessing = ({
 
       if (successCallback) successCallback(stateVal)
       if (topSuccessCallback) topSuccessCallback(stateVal)
+      if (onRefetchApis) {
+        onRefetchApis()
+      }
     }
 
     if (!fullRes) {
@@ -219,7 +225,17 @@ export const useProcessing = ({
 }
 
 export const useApi = (
-  { both = false, errMsg = true, successMsg = false, resErrMsg, resSuccessMsg, cache, fullRes, unmount }: Props,
+  {
+    both = false,
+    errMsg = true,
+    successMsg = false,
+    resErrMsg,
+    resSuccessMsg,
+    cache,
+    fullRes,
+    unmount,
+    refetchApis,
+  }: Props,
   fun?: Fun,
   topSuccessCallback?: CallbackState | null,
   topErrCallback?: CallbackState | null,
@@ -244,7 +260,13 @@ export const useApi = (
 
   useEffect(() => {
     if (fun) {
-      onProcessing({ fun, showFeedback: true, cacheData, cacheFunKey: cache })
+      onProcessing({
+        fun,
+        showFeedback: true,
+        cacheData,
+        cacheFunKey: cache,
+        ...(refetchApis && { onRefetchApis: () => onRefetchApis(refetchApis) }),
+      })
     }
 
     if (unmount) {
@@ -266,6 +288,7 @@ export const useApi = (
         showFeedback: true,
         cacheData,
         cacheFunKey: cache,
+        ...(refetchApis && { onRefetchApis: () => onRefetchApis(refetchApis) }),
       })
     },
     [cacheData, cache],
