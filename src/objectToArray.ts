@@ -23,7 +23,11 @@ function objectToArray({ obj = {}, arr = [], tempKey = null, excludeErrorKeys = 
       if (typeof obj?.[i] === 'object') {
         if (!excludeErrorKeys.includes(tempKey)) objectToArray({ obj: obj[i], arr, tempKey, excludeErrorKeys })
       } else {
-        if (tempKey && typeof obj?.[i] === 'string' && obj?.[i].includes('This field')) {
+        if (
+          tempKey &&
+          typeof obj?.[i] === 'string' &&
+          (obj?.[i].includes('This field') || obj?.[i].includes('is required'))
+        ) {
           if (!excludeErrorKeys.includes(tempKey)) arr.push(`${tempKey}: ${obj?.[i] || obj}`)
         } else {
           if (!excludeErrorKeys.includes(tempKey)) arr.push(obj?.[i] || obj)
@@ -38,7 +42,10 @@ function objectToArray({ obj = {}, arr = [], tempKey = null, excludeErrorKeys = 
       if (typeof obj[key] === 'object') {
         if (!excludeErrorKeys.includes(key)) objectToArray({ obj: obj[key], arr, tempKey, excludeErrorKeys })
       } else {
-        if (key === 'icabbi_error' || (typeof obj[key] === 'string' && obj[key].includes('This field'))) {
+        if (
+          key === 'icabbi_error' ||
+          (typeof obj[key] === 'string' && (obj[key].includes('This field') || obj[key].includes('is required')))
+        ) {
           arr.push(`${tempKey}: ${obj[key]}`)
         } else if (key !== 'code' && !excludeErrorKeys.includes(key)) {
           arr.push(obj[key])

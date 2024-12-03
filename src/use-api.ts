@@ -178,7 +178,7 @@ export const useProcessing = ({
         ...commonStateVal,
         message: resErrMsg || res.message,
       }
-      if ((errMsg || both) && config?.errMsg !== false)
+      if ((errMsg || both) && config?.errMsg !== false && both !== false)
         showFeedback && setFeedback({ message: resErrMsg || res.message, type: 'error' })
 
       if (errCallback) errCallback(stateVal)
@@ -188,7 +188,7 @@ export const useProcessing = ({
         ...commonStateVal,
         message: resSuccessMsg || res.message,
       }
-      if ((successMsg || both) && config?.successMsg !== false)
+      if ((successMsg || both) && config?.successMsg !== false && both !== false)
         showFeedback && setFeedback({ message: resSuccessMsg || res.message, type: 'success' })
 
       if (successCallback) successCallback(stateVal)
