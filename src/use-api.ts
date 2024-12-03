@@ -8,7 +8,7 @@ import { generateUUid } from './generateUUid'
 const cacheFunctions = new Map()
 
 interface Props {
-  both?: boolean
+  both?: boolean | null
   errMsg?: boolean
   successMsg?: boolean
   resErrMsg?: string
@@ -57,7 +57,7 @@ interface Params {
 }
 
 interface Processing {
-  both?: boolean
+  both?: boolean | null
   errMsg?: boolean
   successMsg?: boolean
   resErrMsg?: string
@@ -226,7 +226,7 @@ export const useProcessing = ({
 
 export const useApi = (
   {
-    both = false,
+    both = null,
     errMsg = true,
     successMsg = false,
     resErrMsg,
