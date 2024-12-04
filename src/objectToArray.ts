@@ -26,7 +26,11 @@ function objectToArray({ obj = {}, arr = [], tempKey = null, excludeErrorKeys = 
         if (
           tempKey &&
           typeof obj?.[i] === 'string' &&
-          (obj?.[i].includes('This field') || obj?.[i].includes('is required'))
+          (obj?.[i].includes('This field') ||
+            obj?.[i].includes('is required') ||
+            obj?.[i].includes('is invalid') ||
+            obj?.[i].includes('is not valid') ||
+            obj?.[i].includes('choice'))
         ) {
           if (!excludeErrorKeys.includes(tempKey)) arr.push(`${tempKey}: ${obj?.[i] || obj}`)
         } else {
@@ -44,7 +48,12 @@ function objectToArray({ obj = {}, arr = [], tempKey = null, excludeErrorKeys = 
       } else {
         if (
           key === 'icabbi_error' ||
-          (typeof obj[key] === 'string' && (obj[key].includes('This field') || obj[key].includes('is required')))
+          (typeof obj[key] === 'string' &&
+            (obj[key].includes('This field') ||
+              obj[key].includes('is required') ||
+              obj[key].includes('is invalid') ||
+              obj[key].includes('is not valid') ||
+              obj[key].includes('choice')))
         ) {
           arr.push(`${tempKey}: ${obj[key]}`)
         } else if (key !== 'code' && !excludeErrorKeys.includes(key)) {
