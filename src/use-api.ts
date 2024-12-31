@@ -28,6 +28,8 @@ interface Config {
   loading?: boolean
   successMsg?: boolean
   errMsg?: boolean
+  resSuccessMsg?: string
+  resErrMsg?: string
 }
 
 export interface StateVal {
@@ -179,7 +181,7 @@ export const useProcessing = ({
         message: resErrMsg || res.message,
       }
       if ((errMsg || both) && config?.errMsg !== false && both !== false)
-        showFeedback && setFeedback({ message: resErrMsg || res.message, type: 'error' })
+        showFeedback && setFeedback({ message: config?.resErrMsg || resErrMsg || res.message, type: 'error' })
 
       if (errCallback) errCallback(stateVal)
       if (topErrCallback) topErrCallback(stateVal)
@@ -189,7 +191,7 @@ export const useProcessing = ({
         message: resSuccessMsg || res.message,
       }
       if ((successMsg || both) && config?.successMsg !== false && both !== false)
-        showFeedback && setFeedback({ message: resSuccessMsg || res.message, type: 'success' })
+        showFeedback && setFeedback({ message: config?.resSuccessMsg || resSuccessMsg || res.message, type: 'success' })
 
       if (successCallback) successCallback(stateVal)
       if (topSuccessCallback) topSuccessCallback(stateVal)
